@@ -1,7 +1,7 @@
 function ShipFactory(length){
     // Check truthiness to catch 0 as well as undefined
     if(!(length = parseInt(length))){
-        throw new Error("Invalid ship length. Must be an integer greater than 0");
+        throw new Error("Invalid ship length. Must be an integer between 2 and 5");
     }
 
     const hitMap = new Array(length).fill(false);
@@ -12,9 +12,11 @@ function ShipFactory(length){
 
     const hit = (index) => { hitMap[index] = true };
 
+    const isHitAt = (index) => { return hitMap[index] }
+
     const isSunk = () => { return hitMap.every((value) => value == true) };
 
-    return { getLength, getHitMap, hit, isSunk };
+    return { getLength, getHitMap, hit, isHitAt, isSunk };
 }
 
-module.exports = { ShipFactory };
+module.exports = ShipFactory;

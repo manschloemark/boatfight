@@ -1,5 +1,6 @@
 const ShipFactory = require("./ships");
 const GameBoardFactory = require("./board");
+const Player = require("./player");
 
 
 describe("Test ShipFactory and Ship objects", () => {
@@ -52,6 +53,11 @@ describe("Test ShipFactory and Ship objects", () => {
 describe("Test GameBoard objects", () => {
     let testBoard = GameBoardFactory(2, 2);
 
+    test("Test width and height access", () => {
+        expect(testBoard.width).toBe(2);
+        expect(testBoard.height).toBe(2);
+    })
+
     test("View 2D array", () => {
         expect(testBoard.viewBoard())
         .toEqual([[null, null], [null, null]]);
@@ -65,9 +71,13 @@ describe("Test GameBoard objects", () => {
             [null, null]]);
     });
 
-    test("Cannot on top of an existing ship", () => {
+    test("Cannot place a ship on top of an existing ship", () => {
         expect(() => testBoard.placeShip(0, 0, 1)).toThrow(Error);
     });
+
+    test("Cannot place a ship adjacent to an existing ship", () => {
+        expect(() => testBoard.placeShip(1, 0, 1)).toThrow(Error);
+    })
 
     test("Test allShipsSunk with one unsunk ship", () => {
         expect(testBoard.allShipsSunk()).toBe(false);
@@ -103,7 +113,7 @@ describe("Test GameBoard objects", () => {
     ]
 
     test("Test placing a ship with length > 1 horizontally", () => {
-        largeTestBoard.placeShip(0, 0, 2, false);
+        largeTestBoard.placeShip(0, 0, 2, true);
         expect(largeTestBoard.viewBoard()).toEqual(
         [
             [{ shipIndex: 0, shipOffset: 0, isHit: false }, { shipIndex: 0, shipOffset: 1, isHit: false }, null, null],
@@ -114,13 +124,13 @@ describe("Test GameBoard objects", () => {
     });
 
     test("Test placing a ship with length > 2 vertically", () => {
-        largeTestBoard.placeShip(2, 0, 2, true);
+        largeTestBoard.placeShip(2, 3, 2, false);
         expect(largeTestBoard.viewBoard()).toEqual(
         [
             [{ shipIndex: 0, shipOffset: 0, isHit: false }, { shipIndex: 0, shipOffset: 1, isHit: false }, null, null],
             [null, null, null, null],
-            [{ shipIndex: 1, shipOffset: 0, isHit: false}, null, null, null],
-            [{ shipIndex: 1, shipOffset: 1, isHit: false}, null, null, null]
+            [null, null, null, { shipIndex: 1, shipOffset: 0, isHit: false}],
+            [null, null, null, { shipIndex: 1, shipOffset: 1, isHit: false}]
         ]);
     });
 
@@ -131,8 +141,29 @@ describe("Test GameBoard objects", () => {
     });
 
     test("allShipsSunk returns true when all ships are sunk and there is more than one ship", () => {
-        largeTestBoard.receiveAttack(2, 0);
-        largeTestBoard.receiveAttack(3, 0);
+        largeTestBoard.receiveAttack(2, 3);
+        largeTestBoard.receiveAttack(3, 3);
         expect(largeTestBoard.allShipsSunk()).toBe(true);
+    });
+
+    test("The end of a ship cannot be placed on an invalid tile", () => {
+        expect(() => largeTestBoard.placeShip(2, 0, 3, true)).toThrow(Error);
+    })
+});
+
+describe("Test Player class", () => {
+    test("Player can be set to CPU", () => {
+        const cpuTest = new Player(true);
+        expect(cpuTest.isCPU).toBe(true);
+    });
+
+    test("Human player is default", () => {
+        const humanTest = new Player();
+        expect(humanTest.isCPU).toBe(false);
+    });
+
+    test("Player can send attack coordinates", () => {
+        const shootTest = new Player();
+        expect(shootTest.sendAttack(0, 0)).toEqual([0, 0]);
     });
 });

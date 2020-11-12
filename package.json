@@ -4,7 +4,9 @@
   "description": "Battleship clone made for The Odin Project",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production && ./setup-pages"
   },
   "author": "",
   "license": "ISC",

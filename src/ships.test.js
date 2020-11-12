@@ -65,8 +65,8 @@ describe("Test GameBoard objects", () => {
             [null, null]]);
     });
 
-    test("Cannot place a ship where one already exists", () => {
-        
+    test("Cannot on top of an existing ship", () => {
+        expect(() => testBoard.placeShip(0, 0, 1)).toThrow(Error);
     });
 
     test("Test allShipsSunk with one unsunk ship", () => {

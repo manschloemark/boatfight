@@ -10,6 +10,20 @@ class Player {
         this.gameboard = board;
     }
 
+    randomizeShips(){
+        while(this.unplacedShips.length > 0){
+            try {
+                let r = Math.floor(Math.random(this.gameboard.height));
+                let c = Math.floor(Math.random(this.gameboard.width));
+                let horizontal = Math.random() > 0.5;
+                this.gameboard.placeShip(r, c, this.unplacedShips[0], horizontal);
+            } catch (e) {
+                console.log("Error randomly placing ship, continuing...", e);
+                continue;
+            }
+        }
+    }
+
     // Not sure if I need this...
     setTurn(isTurn){
         this.currentTurn = isTurn;
@@ -33,4 +47,5 @@ class Player {
         return [row, column];
     }
 }
+
 module.exports = Player;

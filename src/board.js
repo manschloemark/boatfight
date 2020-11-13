@@ -1,5 +1,4 @@
-ShipFactory = require("./ships");
-
+const ShipFactory = require("./ships");
 const GameBoardFactory = (rows, columns) => {
     const height = rows;
     const width = columns;
@@ -58,7 +57,7 @@ const GameBoardFactory = (rows, columns) => {
         const shipIndex = ships.length;
         ships.push(newShip);
         for(let i = 0; i < coordinateArray.length; i++){
-            [r, c] = coordinateArray[i];
+            let [r, c] = coordinateArray[i];
             // This is still something I'm not sure about.
             // It feels wasteful, but at the same time, it's way easier than
             // storing the ship object itself at every tile the ship spans
@@ -78,14 +77,18 @@ const GameBoardFactory = (rows, columns) => {
         try {
             const target = grid[row][column]
             if(target) {
-                ships[target.shipIndex].hit(target.shipOffset);
-                target.isHit = true;
+                if(!target.isHit){
+                    ships[target.shipIndex].hit(target.shipOffset);
+                    target.isHit = true;
+                    return true;
+                }
             } else {
                 grid[row][column] = false;
             }
         } catch (e) {
             throw e;
         }
+        return false;
     }
 
     const allShipsSunk = () => {

@@ -2,7 +2,6 @@ const ShipFactory = require("./ships");
 const GameBoardFactory = require("./board");
 const Player = require("./player");
 
-
 describe("Test ShipFactory and Ship objects", () => {
     test("Create a ship with given length", () => {
         const testShip = ShipFactory(3);
@@ -87,16 +86,20 @@ describe("Test GameBoard objects", () => {
         expect(() => testBoard.receiveAttack(3, 3)).toThrow(Error);
     })
 
-    test("Missing a shot turns the value to false", () => {
-        testBoard.receiveAttack(0, 1);
+    test("Missing a shot returns false and turns the tile to false", () => {
+        expect(testBoard.receiveAttack(0, 1)).toBe(false);
         expect(testBoard.viewBoard())
         .toEqual([[{ shipIndex: 0, shipOffset: 0, isHit: false }, false], [null, null]]);
     });
 
-    test("Hitting a shot turns the objects isHit value to true", () => {
-        testBoard.receiveAttack(0, 0);
+    test("Hitting a shot returns true and turns the tile's isHit value to true", () => {
+        expect(testBoard.receiveAttack(0, 0)).toBe(true);
         expect(testBoard.viewBoard())
         .toEqual([[{ shipIndex: 0, shipOffset: 0, isHit: true }, false], [null, null]]);
+    });
+
+    test("Hitting a part of a ship that is already damaged returns false", () => {
+        expect(testBoard.receiveAttack(0, 0)).toBe(false);
     });
 
     test("Test allShipsSunk with one sunken ship", () => {

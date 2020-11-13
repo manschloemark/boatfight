@@ -1,6 +1,6 @@
 class Player {
     constructor(isCPU) {
-        this.currentTurn = null;
+        this.isTurn = null;
         this.isCPU = isCPU || false; // Defaults to false (human)
         this.playHistory = new Array();
         this.gameboard = null;
@@ -10,15 +10,16 @@ class Player {
         this.gameboard = board;
     }
 
-    randomizeShips(){
-        while(this.unplacedShips.length > 0){
+    randomizeShips(unplacedShips){
+        while(unplacedShips.length != 0){
             try {
-                let r = Math.floor(Math.random(this.gameboard.height));
-                let c = Math.floor(Math.random(this.gameboard.width));
+                let r = Math.floor(Math.random() * this.gameboard.height);
+                let c = Math.floor(Math.random() * this.gameboard.width);
                 let horizontal = Math.random() > 0.5;
-                this.gameboard.placeShip(r, c, this.unplacedShips[0], horizontal);
+                this.gameboard.placeShip(r, c, unplacedShips[0], horizontal);
+                unplacedShips.shift();
             } catch (e) {
-                console.log("Error randomly placing ship, continuing...", e);
+                console.log("Random ship placement failed");
                 continue;
             }
         }
@@ -26,25 +27,29 @@ class Player {
 
     // Not sure if I need this...
     setTurn(isTurn){
-        this.currentTurn = isTurn;
+        this.isTurn = isTurn;
     }
 
-    randomAttack(){
+    toggleTurn(){
+        this.isTurn = !this.isTurn;
+    }
+
+    randomAttack(gameboard){
         // Use this.gameboard for width and height because a player's
         // board will be the same size as the opponent's.
-        let row = Math.floor(Math.random() * this.gameboard.height);
-        let column = Math.floor(Math.random() * this.gameboard.width);
+        let row = Math.floor(Math.random() * gameboard.height);
+        let column = Math.floor(Math.random() * gameboard.width);
         while (this.playHistory.includes([row, column])){
-            row = Math.floor(Math.random() * this.gameboard.height);
-            column = Math.floow(Math.random() * this.gameboard.width);
+            row = Math.floor(Math.random() * gameboard.height);
+            column = Math.floow(Math.random() * gameboard.width);
         }
 
-        this.sendAttack(row, column);
+        return [row, column];
     }
 
-    sendAttack(row, column){
+    sendAttack(row, column, targetBoard){
         this.playHistory.push([row, column]);
-        return [row, column];
+        return targetBoard.receiveAttack(row, column);
     }
 }
 

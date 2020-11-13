@@ -17,6 +17,6 @@ function ShipFactory(length){
     const isSunk = () => { return hitMap.every((value) => value == true) };
 
     return { getLength, getHitMap, hit, isHitAt, isSunk };
-}
+};
 
 module.exports = ShipFactory;

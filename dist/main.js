@@ -15,26 +15,29 @@ const DOMControls = __webpack_require__(8);
 
 // There must be a better way to do this. But for now this is okay.
 const executeTurn = (activePlayer, inactivePlayer, event) => {
+    if(!activePlayer.isTurn){
+        return;
+    }
     console.log("Shooting...");
-    let result;
     let row;
     let column;
+    let shotHit;
     if(activePlayer.isCPU){
         [row, column] = activePlayer.randomAttack(inactivePlayer.gameboard);
-        result = activePlayer.sendAttack(row, column, inactivePlayer.gameboard);
     } else {
         row = event.target.dataset["row"];
         column = event.target.dataset["column"];
-
-        result = activePlayer.sendAttack(row, column, inactivePlayer.gameboard);
     }
-    DOMControls.revealTile(row, column, inactivePlayer.gameboard);
+    shotHit = activePlayer.sendAttack(row, column, inactivePlayer.gameboard);
+    //DOMControls.revealTile(row, column, inactivePlayer.gameboard);
     // If the attack hits, 
-    if(!result){
+    if(!shotHit){
         activePlayer.toggleTurn();
         inactivePlayer.toggleTurn();
-        DOMControls.display(inactivePlayer, activePlayer, executeTurn);
+    } else if(activePlayer.isCPU){
+        executeTurn(activePlayer, inactivePlayer);
     }
+    DOMControls.refresh(executeTurn);
 }
 
 const playerOneShips = [5, 4, 3, 3, 2];
@@ -55,7 +58,8 @@ playerTwo.randomizeShips(playerTwoShips);
 playerOne.setTurn(true);
 playerTwo.setTurn(false);
 
-DOMControls.init(playerOne, playerTwo, executeTurn);
+DOMControls.registerPlayers(playerOne, playerTwo);
+DOMControls.refresh(executeTurn);
 
 
 
@@ -375,7 +379,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "html, body {\n    margin: 0;\n    padding: 0;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nmain {\n    width: 100%;\n    margin: 0;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: white;\n    display: grid;\n    gap: 1px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #7696ff;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n#inactive .game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.ship.damaged {\n    color: red;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "html, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nmain {\n    width: 100%;\n    margin: 0;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n    transition: 0.5s;\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -570,6 +574,7 @@ const GameBoardFactory = (rows, columns) => {
                 }
             } else {
                 grid[row][column] = false;
+                return false;
             }
         } catch (e) {
             throw e;
@@ -664,16 +669,16 @@ class Player {
         // board will be the same size as the opponent's.
         let row = Math.floor(Math.random() * gameboard.height);
         let column = Math.floor(Math.random() * gameboard.width);
-        while (this.playHistory.includes([row, column])){
+        while (this.playHistory.includes([row, column].join(""))){
             row = Math.floor(Math.random() * gameboard.height);
-            column = Math.floow(Math.random() * gameboard.width);
+            column = Math.floor(Math.random() * gameboard.width);
         }
 
         return [row, column];
     }
 
     sendAttack(row, column, targetBoard){
-        this.playHistory.push([row, column]);
+        this.playHistory.push([row, column].join(""));
         return targetBoard.receiveAttack(row, column);
     }
 }
@@ -683,158 +688,74 @@ module.exports = Player;
 
 /***/ }),
 /* 8 */
-/***/ ((module) => {
+/***/ (function(module) {
 
 const DOMControls = (() => {
-    const turnIndicator = document.querySelector("#turn-indicator");
+    let playerOne, playerTwo;
+    const registerPlayers = (pOne,pTwo) => {
+        this.playerOne = pOne;
+        this.playerTwo = pTwo;
+    }
 
-
-    // SO now I have two nearly identical functions. I'll fix this later.
-    const initBoard = (player) => {
-        const active = player.isTurn;
-        const gameboard = player.gameboard;
-        if(active){
-            var boardElement = document.querySelector("#active .game-board");
-        } else {
-            var boardElement = document.querySelector("#inactive .game-board");
+    const refreshBoard = (number, player) => {
+        const boardElement = document.querySelector(`#player-${number} .game-board`);
+        while(boardElement.hasChildNodes()){
+            boardElement.removeChild(boardElement.firstChild);
         }
-        boardElement.style.gridTemplateRows = `repeat(${gameboard.height}, 10%)`;
-        boardElement.style.gridTemplateColumns = `repeat(${gameboard.width}, 10%)`;
-        console.log(boardElement);
-        const board = gameboard.viewBoard();
-        for(let r = 0; r < gameboard.height; r++){
-            for(let c = 0; c < gameboard.width; c++){
+        boardElement.style.gridTemplateRows = `repeat(${player.gameboard.height}, 1fr)`;
+        boardElement.style.gridTemplateColumns = `repeat(${player.gameboard.width}, 1fr)`;
+        const board = player.gameboard.viewBoard();
+        for(let r = 0; r < player.gameboard.height; r++){
+            for(let c = 0; c < player.gameboard.width; c++){
                 let tile = document.createElement("div");
-                tile.classList.add(`r${r}c${c}`);
                 tile.dataset["row"] = r;
                 tile.dataset["column"] = c;
                 tile.classList.add("tile");
-                if(board[r][c] == null){
-                    tile.classList.add("unknown");
-
-                } else if (board[r][c] == false){
-                    tile.classList.add("empty");
-                } else {
-                    let shipData = board[r][c];
-                    if(active){
-                        tile.classList.add("ship");
-                    }
-                    if(shipData.isHit){
+                if(board[r][c]){
+                    if(board[r][c].isHit){
                         tile.classList.add("damaged");
-                    } else if (!active) {
+                    } else {
                         tile.classList.add("unknown");
                     }
+                } else if (board[r][c] === false){
+                    tile.classList.add("empty");
+                } else {
+                    tile.classList.add("unknown");
                 }
                 boardElement.appendChild(tile);
             }
         }
-    };
-
-    const updateBoard = (player) => {
-        const active = player.isTurn;
-        const gameboard = player.gameboard;
-        let boardElement;
-        let activeString;
-        if(active){
-            boardElement = document.querySelector("#active .game-board");
-            activeString = "active";
-        } else {
-            boardElement = document.querySelector("#inactive .game-board");
-            activeString = "inactive";
-        }
-        const board = gameboard.viewBoard();
-        for(let r = 0; r < gameboard.height; r++){
-            for(let c = 0; c < gameboard.width; c++){
-                let tile = document.querySelector(`#${activeString} .game-board .r${r}c${c}`);
-                tile.dataset["row"] = r;
-                tile.dataset["column"] = c;
-                tile.classList.add("tile");
-                if(board[r][c] == null){
-                    tile.classList.add("unknown");
-
-                } else if (board[r][c] == false){
-                    tile.classList.add("empty");
-                } else {
-                    let shipData = board[r][c];
-                    if(active){
-                        tile.classList.add("ship");
-                    }
-                    if(shipData.isHit){
-                        tile.classList.add("damaged");
-                    } else if (!active) {
-                        tile.classList.add("unknown");
-                    }
-                }
-                boardElement.appendChild(tile);
-            }
-        }
+        return boardElement;
     }
 
-    const revealTile = (row, column, gameboard) => {
-        const tile = document.querySelector(`#inactive .game-board .r${row}c${column}`);
-        // Quickly convert this to boolean because it can only be empty or damage
-        const hit = !!gameboard.viewBoard()[row][column];
-
-        if(hit){
-            tile.classList.add("damaged");
-        } else {
-            tile.classList.add("empty");
-        }
+    const revealTile = (row, column, board) => {
+        return
     }
 
-    const displayPlayerUI = (player) => {
-        if(player.isTurn){
-            var shipInfo = document.querySelector("#active .ship-dock");
-            shipInfo.textContent = "Your board";
-        } else {
-            var shipInfo = document.querySelector("#inactive .ship-dock");
-            shipInfo.textContent = "Opponent board";
-        }
-    }
-
-    const setupEventListeners = (activePlayer, inactivePlayer, callback) => {
-        document.querySelectorAll("#inactive .game-board .unknown").forEach(element => {
-            element.addEventListener("click", (event) => callback(activePlayer, inactivePlayer, event));
+    const setupAttackListeners = (boardElement, attacker, defender, callback) => {
+        boardElement.querySelectorAll(".unknown").forEach(tile => {
+            tile.addEventListener("click", event => callback(attacker, defender, event));
         });
     }
 
-    const init = (activePlayer, inactivePlayer, callback) => {
-        initBoard(activePlayer);
-        initBoard(inactivePlayer);
-        displayPlayerUI(activePlayer);
-        displayPlayerUI(inactivePlayer);
-        if(activePlayer.isCPU){
-            callback(activePlayer, inactivePlayer);
-        } else {
-            setupEventListeners(activePlayer, inactivePlayer, callback);
+    const refresh = (callback) => {
+        // Initialize the board for each player
+        const boardElementOne = refreshBoard("one", this.playerOne);
+        const boardElementTwo = refreshBoard("two", this.playerTwo);
+        // Add listeners so player one attacks board two and player two attacks board one
+        setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
+        if(!this.playerTwo.isCPU){
+            setupAttackListeners(boardElementOne, this.playerTwo, this.playerOne, callback);
+        } else if(this.playerTwo.isTurn){
+            callback(this.playerTwo, this.playerOne);
         }
-    };
+    }
 
-    const display = (activePlayer, inactivePlayer, callback) => {
-        if(activePlayer.gameboard.allShipsSunk() || inactivePlayer.gameboard.allShipsSunk()){
-            // Update this to do stuff in the DOM
-            console.log("gg");
-            alert("Game over");
-        } else {
-            if(activePlayer.isCPU){
-                callback(activePlayer, inactivePlayer);
-            }
-            updateBoard(activePlayer);
-            updateBoard(inactivePlayer);
-            displayPlayerUI(activePlayer);
-            displayPlayerUI(inactivePlayer);
-            setupEventListeners(activePlayer, inactivePlayer, callback);
-        }
-    };
-
-    return { 
-        init,
-        display,
-        initBoard,
-        updateBoard,
-        revealTile,
-        displayPlayerUI,
-        setupEventListeners,
+    return {
+        registerPlayers,
+        refresh,
+        refreshBoard,
+        setupAttackListeners,
     }
 })();
 
@@ -860,7 +781,7 @@ module.exports = DOMControls;
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;

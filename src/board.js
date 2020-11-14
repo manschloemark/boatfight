@@ -84,6 +84,7 @@ const GameBoardFactory = (rows, columns) => {
                 }
             } else {
                 grid[row][column] = false;
+                return false;
             }
         } catch (e) {
             throw e;

@@ -39,16 +39,16 @@ class Player {
         // board will be the same size as the opponent's.
         let row = Math.floor(Math.random() * gameboard.height);
         let column = Math.floor(Math.random() * gameboard.width);
-        while (this.playHistory.includes([row, column])){
+        while (this.playHistory.includes([row, column].join(""))){
             row = Math.floor(Math.random() * gameboard.height);
-            column = Math.floow(Math.random() * gameboard.width);
+            column = Math.floor(Math.random() * gameboard.width);
         }
 
         return [row, column];
     }
 
     sendAttack(row, column, targetBoard){
-        this.playHistory.push([row, column]);
+        this.playHistory.push([row, column].join(""));
         return targetBoard.receiveAttack(row, column);
     }
 }

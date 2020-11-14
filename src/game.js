@@ -7,26 +7,29 @@ const DOMControls = require("./domcontrols");
 
 // There must be a better way to do this. But for now this is okay.
 const executeTurn = (activePlayer, inactivePlayer, event) => {
+    if(!activePlayer.isTurn){
+        return;
+    }
     console.log("Shooting...");
-    let result;
     let row;
     let column;
+    let shotHit;
     if(activePlayer.isCPU){
         [row, column] = activePlayer.randomAttack(inactivePlayer.gameboard);
-        result = activePlayer.sendAttack(row, column, inactivePlayer.gameboard);
     } else {
         row = event.target.dataset["row"];
         column = event.target.dataset["column"];
-
-        result = activePlayer.sendAttack(row, column, inactivePlayer.gameboard);
     }
-    DOMControls.revealTile(row, column, inactivePlayer.gameboard);
+    shotHit = activePlayer.sendAttack(row, column, inactivePlayer.gameboard);
+    //DOMControls.revealTile(row, column, inactivePlayer.gameboard);
     // If the attack hits, 
-    if(!result){
+    if(!shotHit){
         activePlayer.toggleTurn();
         inactivePlayer.toggleTurn();
-        DOMControls.display(inactivePlayer, activePlayer, executeTurn);
+    } else if(activePlayer.isCPU){
+        executeTurn(activePlayer, inactivePlayer);
     }
+    DOMControls.refresh(executeTurn);
 }
 
 const playerOneShips = [5, 4, 3, 3, 2];
@@ -47,5 +50,6 @@ playerTwo.randomizeShips(playerTwoShips);
 playerOne.setTurn(true);
 playerTwo.setTurn(false);
 
-DOMControls.init(playerOne, playerTwo, executeTurn);
+DOMControls.registerPlayers(playerOne, playerTwo);
+DOMControls.refresh(executeTurn);
 

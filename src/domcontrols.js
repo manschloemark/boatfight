@@ -5,7 +5,15 @@ const DOMControls = (() => {
         this.playerTwo = pTwo;
     }
 
-    const refreshBoard = (number, player) => {
+    const gameOver = (winner, loser) => {
+        const gameOver = document.querySelector("#game-over");
+
+        gameOver.querySelector("#winner").textContent = `Player ${winner} won!`;
+        gameOver.querySelector("#loser").textContent = `Sorry Player ${loser}...`;
+        gameOver.classList.remove("hidden");
+    }
+
+    const renderBoard = (number, player) => {
         const boardElement = document.querySelector(`#player-${number} .game-board`);
         while(boardElement.hasChildNodes()){
             boardElement.removeChild(boardElement.firstChild);
@@ -48,22 +56,33 @@ const DOMControls = (() => {
 
     const refresh = (callback) => {
         // Initialize the board for each player
-        const boardElementOne = refreshBoard("one", this.playerOne);
-        const boardElementTwo = refreshBoard("two", this.playerTwo);
-        // Add listeners so player one attacks board two and player two attacks board one
-        setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
-        if(!this.playerTwo.isCPU){
-            setupAttackListeners(boardElementOne, this.playerTwo, this.playerOne, callback);
-        } else if(this.playerTwo.isTurn){
-            callback(this.playerTwo, this.playerOne);
+        const boardElementOne = renderBoard("one", this.playerOne);
+        const boardElementTwo = renderBoard("two", this.playerTwo);
+
+        if(this.playerOne.gameboard.allShipsSunk()){
+            gameOver("two", "one");
+        } else if(this.playerTwo.gameboard.allShipsSunk()){
+            gameOver("one", "two");
+        } else {
+            // Add listeners so player one attacks board two and player two attacks board one
+            setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
+            if(!this.playerTwo.isCPU){
+                setupAttackListeners(boardElementOne, this.playerTwo, this.playerOne, callback);
+            } else if(this.playerTwo.isTurn){
+                callback(this.playerTwo, this.playerOne);
+            }
         }
     }
+
+    // TESTING PURPOSES ONLY; DELETE THIS NEPHEW
+    document.querySelector("header h1").addEventListener("click", event => gameOver("test", "loser!"));
 
     return {
         registerPlayers,
         refresh,
-        refreshBoard,
+        renderBoard,
         setupAttackListeners,
+        gameOver,
     }
 })();
 

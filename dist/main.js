@@ -379,7 +379,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "html, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nmain {\n    width: 100%;\n    margin: 0;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n    transition: 0.5s;\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n    margin: 0;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    margin: auto;\n    border-radius: 1em;\n    padding: 5em;\n\n    background-color:rgba(36, 36, 36, 0.5);\n\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    font-size: 1em;\n    width: 40%;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -655,7 +655,6 @@ class Player {
         }
     }
 
-    // Not sure if I need this...
     setTurn(isTurn){
         this.isTurn = isTurn;
     }
@@ -697,7 +696,15 @@ const DOMControls = (() => {
         this.playerTwo = pTwo;
     }
 
-    const refreshBoard = (number, player) => {
+    const gameOver = (winner, loser) => {
+        const gameOver = document.querySelector("#game-over");
+
+        gameOver.querySelector("#winner").textContent = `Player ${winner} won!`;
+        gameOver.querySelector("#loser").textContent = `Sorry Player ${loser}...`;
+        gameOver.classList.remove("hidden");
+    }
+
+    const renderBoard = (number, player) => {
         const boardElement = document.querySelector(`#player-${number} .game-board`);
         while(boardElement.hasChildNodes()){
             boardElement.removeChild(boardElement.firstChild);
@@ -740,22 +747,33 @@ const DOMControls = (() => {
 
     const refresh = (callback) => {
         // Initialize the board for each player
-        const boardElementOne = refreshBoard("one", this.playerOne);
-        const boardElementTwo = refreshBoard("two", this.playerTwo);
-        // Add listeners so player one attacks board two and player two attacks board one
-        setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
-        if(!this.playerTwo.isCPU){
-            setupAttackListeners(boardElementOne, this.playerTwo, this.playerOne, callback);
-        } else if(this.playerTwo.isTurn){
-            callback(this.playerTwo, this.playerOne);
+        const boardElementOne = renderBoard("one", this.playerOne);
+        const boardElementTwo = renderBoard("two", this.playerTwo);
+
+        if(this.playerOne.gameboard.allShipsSunk()){
+            gameOver("two", "one");
+        } else if(this.playerTwo.gameboard.allShipsSunk()){
+            gameOver("one", "two");
+        } else {
+            // Add listeners so player one attacks board two and player two attacks board one
+            setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
+            if(!this.playerTwo.isCPU){
+                setupAttackListeners(boardElementOne, this.playerTwo, this.playerOne, callback);
+            } else if(this.playerTwo.isTurn){
+                callback(this.playerTwo, this.playerOne);
+            }
         }
     }
+
+    // TESTING PURPOSES ONLY; DELETE THIS NEPHEW
+    document.querySelector("header h1").addEventListener("click", event => gameOver("test", "loser!"));
 
     return {
         registerPlayers,
         refresh,
-        refreshBoard,
+        renderBoard,
         setupAttackListeners,
+        gameOver,
     }
 })();
 

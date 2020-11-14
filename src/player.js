@@ -25,7 +25,6 @@ class Player {
         }
     }
 
-    // Not sure if I need this...
     setTurn(isTurn){
         this.isTurn = isTurn;
     }

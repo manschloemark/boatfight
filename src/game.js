@@ -5,6 +5,18 @@ const Player = require("./player");
 
 const DOMControls = require("./domcontrols");
 
+function initializeMatch(event) {
+    const players = DOMControls.getPlayerInputs()
+                                .map(playerInfo => new Player(...playerInfo));
+
+    players.forEach(player => player.setGameboard(GameBoardFactory(10, 10)));
+    initShipPlacement(...players);
+}
+
+function initShipPlacement(playerOne, playerTwo){
+    
+}
+
 // There must be a better way to do this. But for now this is okay.
 const executeTurn = (activePlayer, inactivePlayer, event) => {
     if(!activePlayer.isTurn){
@@ -32,23 +44,8 @@ const executeTurn = (activePlayer, inactivePlayer, event) => {
     DOMControls.refresh(executeTurn);
 }
 
-const playerOneShips = [5, 4, 3, 3, 2];
-const boardOne = GameBoardFactory(10, 10);
-const playerOne = new Player();
-playerOne.setGameboard(boardOne);
+DOMControls.init();
 
-const playerTwoShips = [5, 4, 3, 3, 2];
-const boardTwo = GameBoardFactory(10, 10);
-const playerTwo = new Player(true);
-playerTwo.setGameboard(boardTwo);
 
-// TEMP
-// Randomly set ships for both players
-playerOne.randomizeShips(playerOneShips);
-playerTwo.randomizeShips(playerTwoShips);
-// Maybe make this random later
-playerOne.setTurn(true);
-playerTwo.setTurn(false);
-
-//DOMControls.refresh(executeTurn);
-
+// Set up event listeners
+document.querySelector("#new-game").addEventListener("click", initializeMatch)

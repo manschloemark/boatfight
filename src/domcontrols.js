@@ -33,17 +33,12 @@ const DOMControls = (() => {
     }
 
     const registerPlayers = (pOne,pTwo) => {
-        const boardOne = GameBoardFactory(10, 10);
-        const boardTwo = GameBoardFactory(10, 10);
-        pOne.setGameboard(boardOne);
-        pTwo.setGameboard(boardTwo);
         this.playerOne = pOne;
         this.playerTwo = pTwo;
     }
 
     const gameOver = (winner, loser) => {
         const gameOver = document.querySelector("#game-over");
-
         gameOver.querySelector("#winner").textContent = `Player ${winner} won!`;
         gameOver.querySelector("#loser").textContent = `Sorry Player ${loser}...`;
         gameOver.classList.remove("hidden");
@@ -96,12 +91,16 @@ const DOMControls = (() => {
         const boardElementTwo = renderBoard("two", this.playerTwo);
 
         if(this.playerOne.gameboard.allShipsSunk()){
-            gameOver("two", "one");
+            gameOver(this.playerTwo.name, this.playerOne.name);
         } else if(this.playerTwo.gameboard.allShipsSunk()){
-            gameOver("one", "two");
+            gameOver(this.playerOne.name, this.playerTwo.name);
         } else {
             // Add listeners so player one attacks board two and player two attacks board one
-            setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
+            if(!this.playerOne.isCPU){
+                setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
+            } else if (this.playerOne.isTurn){
+                callback(this.playerTwo, this.playerOne);
+            }
             if(!this.playerTwo.isCPU){
                 setupAttackListeners(boardElementOne, this.playerTwo, this.playerOne, callback);
             } else if(this.playerTwo.isTurn){

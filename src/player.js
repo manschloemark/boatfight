@@ -1,5 +1,6 @@
 class Player {
-    constructor(isCPU) {
+    constructor(isCPU, name) {
+        this.name = name;
         this.isTurn = null;
         this.isCPU = isCPU || false; // Defaults to false (human)
         this.playHistory = new Array();

@@ -1,6 +1,42 @@
+const GameBoardFactory = require("./board");
+const Player = require("./player");
+
 const DOMControls = (() => {
     let playerOne, playerTwo;
+
+    this.startScreen = document.querySelector("#start-up");
+    this.endScreen = document.querySelector("#game-over");
+    this.inGameScreen = document.querySelector("#in-game");
+
+    const playerCreation = () => {
+        this.endScreen.classList.add("hidden");
+        this.inGameScreen.classList.add("hidden");
+        this.startScreen.classList.remove("hidden");
+    }
+
+    const startGame = (event) => {
+        // Create players from each player entry
+        // Register the players so this object can easily refer to them
+        // Switch screen to the game screen
+        //  - Specifically the ship-placement screen
+        const playerEntries = document.querySelectorAll(".player-entry");
+        const players = [];
+        playerEntries.forEach(entryElement => {
+            const playerName = entryElement.querySelector("#player-name").text;
+            const isCPU = entryElement.querySelector("#is-cpu").checked;
+            players.push(new Player(isCPU, playerName));
+        });
+        registerPlayers(...players);
+
+        this.inGameScreen.classList.remove("hidden");
+        this.startScreen.classList.add("hidden");
+    }
+
     const registerPlayers = (pOne,pTwo) => {
+        const boardOne = GameBoardFactory(10, 10);
+        const boardTwo = GameBoardFactory(10, 10);
+        pOne.setGameboard(boardOne);
+        pTwo.setGameboard(boardTwo);
         this.playerOne = pOne;
         this.playerTwo = pTwo;
     }
@@ -76,6 +112,9 @@ const DOMControls = (() => {
 
     // TESTING PURPOSES ONLY; DELETE THIS NEPHEW
     document.querySelector("header h1").addEventListener("click", event => gameOver("test", "loser!"));
+
+    // Set up event listeners for the UI that doesn't change
+    document.querySelector("#new-game").onclick = startGame;
 
     return {
         registerPlayers,

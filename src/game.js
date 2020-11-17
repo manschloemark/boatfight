@@ -50,6 +50,5 @@ playerTwo.randomizeShips(playerTwoShips);
 playerOne.setTurn(true);
 playerTwo.setTurn(false);
 
-DOMControls.registerPlayers(playerOne, playerTwo);
-DOMControls.refresh(executeTurn);
+//DOMControls.refresh(executeTurn);
 

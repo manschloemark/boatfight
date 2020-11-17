@@ -58,8 +58,7 @@ playerTwo.randomizeShips(playerTwoShips);
 playerOne.setTurn(true);
 playerTwo.setTurn(false);
 
-DOMControls.registerPlayers(playerOne, playerTwo);
-DOMControls.refresh(executeTurn);
+//DOMControls.refresh(executeTurn);
 
 
 
@@ -379,7 +378,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n    margin: 0;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    margin: auto;\n    border-radius: 1em;\n    padding: 5em;\n\n    background-color:rgba(36, 36, 36, 0.5);\n\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    font-size: 1em;\n    width: 40%;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\n/* \n    Start screen styling\n*/\n#start-up {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    margin: auto;\n    border-radius: 1em;\n    padding: 5em;\n\n    background-color:rgba(36, 36, 36, 0.5);\n\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    font-size: 1em;\n    width: 40%;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n\n#in-game {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -629,7 +628,8 @@ module.exports = GameBoardFactory;
 /***/ ((module) => {
 
 class Player {
-    constructor(isCPU) {
+    constructor(isCPU, name) {
+        this.name = name;
         this.isTurn = null;
         this.isCPU = isCPU || false; // Defaults to false (human)
         this.playHistory = new Array();
@@ -687,11 +687,47 @@ module.exports = Player;
 
 /***/ }),
 /* 8 */
-/***/ (function(module) {
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+const GameBoardFactory = __webpack_require__(6);
+const Player = __webpack_require__(7);
 
 const DOMControls = (() => {
     let playerOne, playerTwo;
+
+    this.startScreen = document.querySelector("#start-up");
+    this.endScreen = document.querySelector("#game-over");
+    this.inGameScreen = document.querySelector("#in-game");
+
+    const playerCreation = () => {
+        this.endScreen.classList.add("hidden");
+        this.inGameScreen.classList.add("hidden");
+        this.startScreen.classList.remove("hidden");
+    }
+
+    const startGame = (event) => {
+        // Create players from each player entry
+        // Register the players so this object can easily refer to them
+        // Switch screen to the game screen
+        //  - Specifically the ship-placement screen
+        const playerEntries = document.querySelectorAll(".player-entry");
+        const players = [];
+        playerEntries.forEach(entryElement => {
+            const playerName = entryElement.querySelector("#player-name").text;
+            const isCPU = entryElement.querySelector("#is-cpu").checked;
+            players.push(new Player(isCPU, playerName));
+        });
+        registerPlayers(...players);
+
+        this.inGameScreen.classList.remove("hidden");
+        this.startScreen.classList.add("hidden");
+    }
+
     const registerPlayers = (pOne,pTwo) => {
+        const boardOne = GameBoardFactory(10, 10);
+        const boardTwo = GameBoardFactory(10, 10);
+        pOne.setGameboard(boardOne);
+        pTwo.setGameboard(boardTwo);
         this.playerOne = pOne;
         this.playerTwo = pTwo;
     }
@@ -767,6 +803,9 @@ const DOMControls = (() => {
 
     // TESTING PURPOSES ONLY; DELETE THIS NEPHEW
     document.querySelector("header h1").addEventListener("click", event => gameOver("test", "loser!"));
+
+    // Set up event listeners for the UI that doesn't change
+    document.querySelector("#new-game").onclick = startGame;
 
     return {
         registerPlayers,

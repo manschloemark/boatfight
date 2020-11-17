@@ -24,10 +24,31 @@ header {
 
 main {
     width: 100%;
-    margin: 0;
+}
+
+main div {
+    margin: auto;
+}
+
+/* 
+    Start screen styling
+*/
+#start-up {
+    width: 60%;
     display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
+    flex-direction: column;
+    align-content: center;
+
+    text-align: center;
+}
+
+#player-creation {
+    display: flex;
+    justify-content: space-around;
+}
+
+#new-game {
+    margin: auto;
 }
 
 #game-over {
@@ -56,6 +77,12 @@ main {
     background-color: rgba(240, 240, 240, 0.5);
     border: 2px solid rgba(200, 200, 200, 0.5);
     border-radius: 6px;
+}
+
+#in-game {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
 }
 
 .player-container {
@@ -99,5 +126,5 @@ main {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }

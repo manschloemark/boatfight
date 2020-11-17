@@ -13,15 +13,21 @@
                 <h2>Boat Fight!</h2>
                 <p>Two players battle with ships!</p>
                 <div id="player-creation">
-                    <h3>Player One</h3>
                     <div class="player-entry">
-                        <label for="player-one-name">Name</label>
-                        <input type="text">
+                        <h3>Player One</h3>
+                        <label for="player-name">Name</label>
+                        <input type="text" id="player-name" value="Player One">
+                        <br>
+                        <label for="is-cpu">CPU</label>
+                        <input type="checkbox"  id="is-cpu">
                     </div>
                     <div class="player-entry">
                         <h3>Player Two</h3>
-                        <label for="player-two-name">Name</label>
-                        <input type="text">
+                        <label for="player-name">Name</label>
+                        <input type="text" id="player-name" value="Player Two">
+                        <br>
+                        <label for="is-cpu">CPU</label>
+                        <input type="checkbox" id="is-cpu" checked>
                     </div>
                 </div>
                 <button type="button" id="new-game">New Game</button>

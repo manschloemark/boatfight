@@ -20,8 +20,6 @@ const DOMControls = (() => {
 
     const showGameOver = () => {
         this.gameOver.classList.remove("hidden");
-        this.inGame.classList.add("hidden");
-        this.startMenu.classList.add("hidden");
     }
 
     const readPlayerInput = () => {

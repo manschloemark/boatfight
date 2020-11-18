@@ -20,7 +20,7 @@ function toggleTurns(playerOne, playerTwo){
     playerTwo.setTurn(playerOne.isTurn);
 }
 
-const executeTurn = (playerOne, playerTwo, event) => {
+function executeTurn(playerOne, playerTwo, event){
     let attacker, board;
     if(playerOne.isTurn){
         attacker = playerOne;
@@ -50,7 +50,7 @@ const executeTurn = (playerOne, playerTwo, event) => {
 }
 
 function startPlayerCreation(){
-    DOMControls.showPlayerCreation();
+    DOMControls.showStartMenu();
 }
 
 function startNewGame(){
@@ -67,6 +67,7 @@ function startNewGame(){
     playerOne.setTurn((Math.random() > 0.5));
     playerTwo.setTurn(! playerOne.isTurn);
 
+    DOMControls.showGameUI();
     shipPlacementTurn(playerOne, playerTwo);
 }
 
@@ -78,8 +79,6 @@ function randomShipPlacement(playerOne, playerTwo, ships){
         activePlayer = playerTwo;
     }
     activePlayer.randomizeShips(ships);
-    toggleTurns(playerOne, playerTwo);
-    shipPlacementTurn(playerOne, playerTwo);
 }
 
 function shipPlacementTurn(playerOne, playerTwo){
@@ -91,11 +90,14 @@ function shipPlacementTurn(playerOne, playerTwo){
         activePlayer = playerTwo;
     }
     if(activePlayer.ready){
-        //Done
+        // If this function is called and the player who's turn it is has already
+        // ready up'd, ship placement is now complete.
+        setupTurn(playerOne, playerTwo);
     } else {
         const ships = ShipArray.slice(0);
         if(activePlayer.isCPU){
             randomShipPlacement(playerOne, playerTwo, ships);
+            activePlayer.setReady(true);
             finishShipPlacement(playerOne, playerTwo, ships);
         } else {
             randomShipPlacement(playerOne, playerTwo, ships);
@@ -108,6 +110,7 @@ function shipPlacementTurn(playerOne, playerTwo){
             // finishShipPlacement will be passed as the callback to "Ready" when a human
             // is placing ships, so they can randomize ship placements without automatically
             // accepting it.
+            activePlayer.setReady(true);
             finishShipPlacement(playerOne, playerTwo, ships);
         }
         
@@ -122,7 +125,8 @@ function finishShipPlacement(playerOne, playerTwo, ships){
 }
 
 function setupTurn(playerOne, playerTwo){
-
+    DOMControls.renderBoards(playerOne, playerTwo);
+    DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
 }
 
 // Add event listeners for the game
@@ -447,7 +451,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\n/* \n    Start screen styling\n*/\n#start-up {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    margin: auto;\n    border-radius: 1em;\n    padding: 5em;\n\n    background-color:rgba(36, 36, 36, 0.5);\n\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    font-size: 1em;\n    width: 40%;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n\n#in-game {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    margin: auto;\n    border-radius: 1em;\n    padding: 5em;\n\n    background-color:rgba(36, 36, 36, 0.5);\n\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    font-size: 1em;\n    width: 40%;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n\n#in-game {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -723,7 +727,6 @@ class Player {
                 continue;
             }
         }
-        this.readyUp();
     }
 
     setReady(ready){
@@ -766,16 +769,28 @@ module.exports = Player;
 
 const DOMControls = (() => {
 
-    this.playerCreation = document.querySelector("#player-creation");
+    this.startMenu = document.querySelector("#start-menu");
     this.inGame = document.querySelector("#in-game");
     this.gameOver = document.querySelector("#game-over");
     this.playerOneElement = document.querySelector("#player-one");
     this.playerTwoElement = document.querySelector("#player-two");
 
-    const showPlayerCreation = () => {
-        this.playerCreation.classList.remove("hidden");
+    const showStartMenu = () => {
+        this.startMenu.classList.remove("hidden");
         this.inGame.classList.add("hidden");
         this.gameOver.classList.add("hidden");
+    }
+
+    const showGameUI = () => {
+        this.inGame.classList.remove("hidden");
+        this.startMenu.classList.add("hidden");
+        this.gameOver.classList.add("hidden");
+    }
+
+    const showGameOver = () => {
+        this.gameOver.classList.remove("hidden");
+        this.inGame.classList.add("hidden");
+        this.startMenu.classList.add("hidden");
     }
 
     const readPlayerInput = () => {
@@ -794,7 +809,7 @@ const DOMControls = (() => {
 
     const clearBoard = (board) => {
         while(board.hasChildNodes()){
-            board.removeChild(boardElement.firstChild);
+            board.removeChild(board.firstChild);
         }
     }
 
@@ -838,7 +853,6 @@ const DOMControls = (() => {
     const renderBoards = (playerOne, playerTwo) => {
         const boardOne = this.playerOneElement.querySelector(".game-board");
         const boardTwo = this.playerTwoElement.querySelector(".game-board");
-        console.log(boardOne);
         renderBoard(boardOne, playerOne);
         renderBoard(boardTwo, playerTwo);
     }
@@ -873,7 +887,9 @@ const DOMControls = (() => {
     }
 
     return {
-        showPlayerCreation,
+        showStartMenu,
+        showGameUI,
+        showGameOver,
         readPlayerInput,
         clearBoard,
         renderBoard,

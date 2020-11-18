@@ -1,127 +1,120 @@
-const GameBoardFactory = require("./board");
-const Player = require("./player");
-
 const DOMControls = (() => {
-    let playerOne, playerTwo;
 
-    this.startScreen = document.querySelector("#start-up");
-    this.endScreen = document.querySelector("#game-over");
-    this.inGameScreen = document.querySelector("#in-game");
+    this.playerCreation = document.querySelector("#player-creation");
+    this.inGame = document.querySelector("#in-game");
+    this.gameOver = document.querySelector("#game-over");
+    this.playerOneElement = document.querySelector("#player-one");
+    this.playerTwoElement = document.querySelector("#player-two");
 
-    const playerCreation = () => {
-        this.endScreen.classList.add("hidden");
-        this.inGameScreen.classList.add("hidden");
-        this.startScreen.classList.remove("hidden");
+    const showPlayerCreation = () => {
+        this.playerCreation.classList.remove("hidden");
+        this.inGame.classList.add("hidden");
+        this.gameOver.classList.add("hidden");
     }
 
-    const startGame = (event) => {
-        // Create players from each player entry
-        // Register the players so this object can easily refer to them
-        // Switch screen to the game screen
-        //  - Specifically the ship-placement screen
-        const playerEntries = document.querySelectorAll(".player-entry");
-        const players = [];
-        playerEntries.forEach(entryElement => {
-            const playerName = entryElement.querySelector("#player-name").text;
-            const isCPU = entryElement.querySelector("#is-cpu").checked;
-            players.push(new Player(isCPU, playerName));
+    const readPlayerInput = () => {
+        const playerDivs = document.querySelectorAll(".player-entry");
+        const playerData = [];
+        playerDivs.forEach(div => {
+            let name = div.querySelector(".player-name").value;
+            if(name == ''){
+                name = div.querySelector("h3").textContent;
+            }
+            let isCPU = div.querySelector(".is-cpu").checked;
+            playerData.push([isCPU, name]);
         });
-        registerPlayers(...players);
-
-        this.inGameScreen.classList.remove("hidden");
-        this.startScreen.classList.add("hidden");
+        return playerData;
     }
 
-    const registerPlayers = (pOne,pTwo) => {
-        this.playerOne = pOne;
-        this.playerTwo = pTwo;
-    }
-
-    const gameOver = (winner, loser) => {
-        const gameOver = document.querySelector("#game-over");
-        gameOver.querySelector("#winner").textContent = `Player ${winner} won!`;
-        gameOver.querySelector("#loser").textContent = `Sorry Player ${loser}...`;
-        gameOver.classList.remove("hidden");
-    }
-
-    const renderBoard = (number, player) => {
-        const boardElement = document.querySelector(`#player-${number} .game-board`);
-        while(boardElement.hasChildNodes()){
-            boardElement.removeChild(boardElement.firstChild);
+    const clearBoard = (board) => {
+        while(board.hasChildNodes()){
+            board.removeChild(boardElement.firstChild);
         }
-        boardElement.style.gridTemplateRows = `repeat(${player.gameboard.height}, 1fr)`;
-        boardElement.style.gridTemplateColumns = `repeat(${player.gameboard.width}, 1fr)`;
+    }
+
+    const renderBoard = (boardElement, player) => {
+        clearBoard(boardElement);
+        if(player.isTurn){
+            boardElement.classList.add("active");
+            boardElement.classList.remove("idle");
+        } else {
+            boardElement.classList.add("idle");
+            boardElement.classList.remove("active");
+        }
         const board = player.gameboard.viewBoard();
-        for(let r = 0; r < player.gameboard.height; r++){
-            for(let c = 0; c < player.gameboard.width; c++){
+        const numRows = player.gameboard.height;
+        const numCols = player.gameboard.width;
+        for(let row = 0; row < numRows; row++){
+            for(let col = 0; col < numCols; col++){
                 let tile = document.createElement("div");
-                tile.dataset["row"] = r;
-                tile.dataset["column"] = c;
+                tile.dataset["row"] = row;
+                tile.dataset["column"] = col;
                 tile.classList.add("tile");
-                if(board[r][c]){
-                    if(board[r][c].isHit){
+                if (board[row][col]){
+                    if(board[row][col].isHit){
                         tile.classList.add("damaged");
                     } else {
-                        tile.classList.add("unknown");
+                        if (player.isTurn){
+                            tile.classList.add("ship");
+                        } else {
+                            tile.classList.add("unknown");
+                        }
                     }
-                } else if (board[r][c] === false){
+                } else if (board[row][col] === false){
                     tile.classList.add("empty");
                 } else {
                     tile.classList.add("unknown");
                 }
-                boardElement.appendChild(tile);
             }
         }
-        return boardElement;
     }
 
-    const revealTile = (row, column, board) => {
-        return
+    const renderBoards = (playerOne, playerTwo) => {
+        const boardOne = this.playerOneElement.querySelector(".game-board");
+        const boardTwo = this.playerTwoElement.querySelector(".game-board");
+        console.log(boardOne);
+        renderBoard(boardOne, playerOne);
+        renderBoard(boardTwo, playerTwo);
     }
 
-    const setupAttackListeners = (boardElement, attacker, defender, callback) => {
-        boardElement.querySelectorAll(".unknown").forEach(tile => {
-            tile.addEventListener("click", event => callback(attacker, defender, event));
-        });
-    }
-
-    const refresh = (callback) => {
-        // Initialize the board for each player
-        const boardElementOne = renderBoard("one", this.playerOne);
-        const boardElementTwo = renderBoard("two", this.playerTwo);
-
-        if(this.playerOne.gameboard.allShipsSunk()){
-            gameOver(this.playerTwo.name, this.playerOne.name);
-        } else if(this.playerTwo.gameboard.allShipsSunk()){
-            gameOver(this.playerOne.name, this.playerTwo.name);
+    const renderDocks = (playerOne, playerTwo, ships) => {
+        let dock;
+        if(playerOne.isTurn){
+            dock = this.playerOneElement.querySelector(".ship-dock");
         } else {
-            // Add listeners so player one attacks board two and player two attacks board one
-            if(!this.playerOne.isCPU){
-                setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
-            } else if (this.playerOne.isTurn){
-                callback(this.playerTwo, this.playerOne);
-            }
-            if(!this.playerTwo.isCPU){
-                setupAttackListeners(boardElementOne, this.playerTwo, this.playerOne, callback);
-            } else if(this.playerTwo.isTurn){
-                callback(this.playerTwo, this.playerOne);
-            }
+            dock = this.playerTwoElement.querySelector(".ship-dock");
         }
+        dock.textContent = ships;
     }
 
-    // TESTING PURPOSES ONLY; DELETE THIS NEPHEW
-    document.querySelector("header h1").addEventListener("click", event => gameOver("test", "loser!"));
-
-    // Set up event listeners for the UI that doesn't change
-    document.querySelector("#new-game").onclick = startGame;
+    const addAttackListeners = (playerOne, playerTwo, callback) => {
+        let board;
+        if(playerOne.isTurn){
+            board = this.playerTwoElement.querySelector(".game-board");
+            board.querySelectorAll(".tile.unknown").forEach(tile => {
+                tile.addEventListener("onclick", (event) => {
+                    callback(playerOne, playerTwo, event);
+                })
+            })
+        } else {
+            board = this.playerOneElement.querySelector(".game-board");
+            board.querySelectorAll(".tile.unknown").forEach(tile => {
+                tile.addEventListener("onclick", (event) => {
+                    callback(playerOne, playerTwo, event);
+                })
+            })
+        }
+    }
 
     return {
-        registerPlayers,
-        refresh,
+        showPlayerCreation,
+        readPlayerInput,
+        clearBoard,
         renderBoard,
-        setupAttackListeners,
-        gameOver,
-    }
+        renderBoards,
+        renderDocks,
+        addAttackListeners,
+   };
 })();
 
 module.exports = DOMControls;

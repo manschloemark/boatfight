@@ -31,10 +31,7 @@ function executeTurn(playerOne, playerTwo, event){
     }
     const attackHit = attacker.sendAttack(row, column, board);
 
-    if(attackHit){
-        //Don't swap turns
-    } else {
-        //Swap turns
+    if(!attackHit){
         toggleTurns(playerOne, playerTwo);
     }
     setupTurn(playerOne, playerTwo);
@@ -120,14 +117,25 @@ function finishShipPlacement(playerOne, playerTwo, ships){
 
 function setupTurn(playerOne, playerTwo){
     if(playerOne.gameboard.allShipsSunk()){
-        gameOver(playerOne, playerTwo);
-    } else if (playerTwo.gameboard.allShipsSunk()){
-        gameOver(playerTwo, playerOne);
-    } else {
+        gameOver(playerOne, playerTwo, false);
+     } else if (playerTwo.gameboard.allShipsSunk()){
+         gameOver(playerOne, playerTwo, true)
+     } else {
         if((playerOne.isTurn && playerOne.isCPU) || (playerTwo.isTurn && playerTwo.isCPU)){
-            // Trying out a small delay on CPU.
-            //setTimeout(1000, () => executeTurn(playerOne, playerTwo));
-            executeTurn(playerOne, playerTwo);
+            // If both players are CPU, it's assumed that the human wants to watch
+            // the CPU's 'simulate' a game, so the boards are drawn and the CPU's take
+            // a half a second to attack.
+            // In a human vs CPU battle, I assume the player doesn't care to
+            // watch the CPU attack, and the board is not rendered for CPU turns.
+            if(playerOne.isCPU && playerTwo.isCPU){
+                DOMControls.renderBoards(playerOne, playerTwo);
+                setTimeout(() => {
+                    executeTurn(playerOne, playerTwo)
+                }, 500);
+            } else {
+                executeTurn(playerOne, playerTwo);
+            }
+            //executeTurn(playerOne, playerTwo);
         } else {
             DOMControls.renderBoards(playerOne, playerTwo);
             DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
@@ -135,8 +143,22 @@ function setupTurn(playerOne, playerTwo){
     }
 }
 
-function gameOver(winner, loser){
-    DOMControls.displayWinner(winner, loser);
+// the parameter 'playerOneWins' is only used so I can a) keep the order of players
+// consistent in gameOver's arguments without needing to call allShipsSunk again.
+// So I can just check playerOneWins to determine what to do in here.
+function gameOver(playerOne, playerTwo, playerOneWins){
+    // Set both players isTurn to true so the renderBoards method displays all info.
+    // There's no need to hide the idle players ships since the game is over.
+    // There's probably a more elegant way to address this, but for now this is quick
+    // and easy.
+    playerOne.setTurn(true);
+    playerTwo.setTurn(true);
+    DOMControls.renderBoards(playerOne, playerTwo);
+    if(playerOneWins){
+        DOMControls.displayWinner(playerOne, playerTwo);
+    } else {
+        DOMControls.displayWinner(playerTwo, playerOne);
+    }
     DOMControls.showGameOver();
 }
 // Add event listeners for the game

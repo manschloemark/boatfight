@@ -9,7 +9,7 @@ const ShipArray = [2, 3, 3, 4, 5];
 
 function toggleTurns(playerOne, playerTwo){
     playerOne.toggleTurn();
-    playerTwo.setTurn(playerOne.isTurn);
+    playerTwo.setTurn(! playerOne.isTurn);
 }
 
 function executeTurn(playerOne, playerTwo, event){
@@ -24,7 +24,7 @@ function executeTurn(playerOne, playerTwo, event){
 
     let row, column;
     if(attacker.isCPU){
-        [row, column] = attacker.randomAttack();
+        [row, column] = attacker.randomAttack(board);
     } else {
         row = event.target.dataset["row"];
         column = event.target.dataset["column"];
@@ -52,6 +52,8 @@ function startNewGame(){
 
     const boardOne = GameBoardFactory(10, 10);
     const boardTwo = GameBoardFactory(10, 10);
+    // Maybe make the board size an option?
+    DOMControls.setBoardGrid(10, 10);
 
     playerOne.setGameboard(boardOne);
     playerTwo.setGameboard(boardTwo);
@@ -117,12 +119,30 @@ function finishShipPlacement(playerOne, playerTwo, ships){
 }
 
 function setupTurn(playerOne, playerTwo){
-    DOMControls.renderBoards(playerOne, playerTwo);
-    DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
+    if(playerOne.gameboard.allShipsSunk()){
+        gameOver(playerOne, playerTwo);
+    } else if (playerTwo.gameboard.allShipsSunk()){
+        gameOver(playerTwo, playerOne);
+    } else {
+        if((playerOne.isTurn && playerOne.isCPU) || (playerTwo.isTurn && playerTwo.isCPU)){
+            // Trying out a small delay on CPU.
+            //setTimeout(1000, () => executeTurn(playerOne, playerTwo));
+            executeTurn(playerOne, playerTwo);
+        } else {
+            DOMControls.renderBoards(playerOne, playerTwo);
+            DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
+        }
+    }
 }
 
+function gameOver(winner, loser){
+    DOMControls.displayWinner(winner, loser);
+    DOMControls.showGameOver();
+}
 // Add event listeners for the game
 document.querySelector("#new-game").addEventListener("click", startNewGame);
+document.querySelector("#rematch").addEventListener("click", startNewGame);
+document.querySelector("#change-players").addEventListener("click", startPlayerCreation);
 
 // Make sure the page loads to the player creation screen at first
 startPlayerCreation();

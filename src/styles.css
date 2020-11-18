@@ -81,8 +81,20 @@ main div {
 
 #in-game {
     display: flex;
+    flex-direction: column;
+}
+
+#player-flex-box{
+    display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+
+    width: 100%;
+    margin: auto;
+}
+
+#who-attacks {
+    text-align: center;
 }
 
 .player-container {
@@ -94,6 +106,10 @@ main div {
     display: grid;
     gap: 2px;
     place-content: center center;
+}
+
+.game-board.idle {
+    border: 2px solid red;
 }
 
 .tile {
@@ -118,7 +134,7 @@ main div {
 }
 
 .tile.ship {
-    background-color: #242424;
+    background-color: #696969;
 }
 
 .tile.damaged {

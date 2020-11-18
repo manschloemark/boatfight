@@ -17,7 +17,7 @@ const ShipArray = [2, 3, 3, 4, 5];
 
 function toggleTurns(playerOne, playerTwo){
     playerOne.toggleTurn();
-    playerTwo.setTurn(playerOne.isTurn);
+    playerTwo.setTurn(! playerOne.isTurn);
 }
 
 function executeTurn(playerOne, playerTwo, event){
@@ -32,7 +32,7 @@ function executeTurn(playerOne, playerTwo, event){
 
     let row, column;
     if(attacker.isCPU){
-        [row, column] = attacker.randomAttack();
+        [row, column] = attacker.randomAttack(board);
     } else {
         row = event.target.dataset["row"];
         column = event.target.dataset["column"];
@@ -60,6 +60,8 @@ function startNewGame(){
 
     const boardOne = GameBoardFactory(10, 10);
     const boardTwo = GameBoardFactory(10, 10);
+    // Maybe make the board size an option?
+    DOMControls.setBoardGrid(10, 10);
 
     playerOne.setGameboard(boardOne);
     playerTwo.setGameboard(boardTwo);
@@ -125,12 +127,30 @@ function finishShipPlacement(playerOne, playerTwo, ships){
 }
 
 function setupTurn(playerOne, playerTwo){
-    DOMControls.renderBoards(playerOne, playerTwo);
-    DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
+    if(playerOne.gameboard.allShipsSunk()){
+        gameOver(playerOne, playerTwo);
+    } else if (playerTwo.gameboard.allShipsSunk()){
+        gameOver(playerTwo, playerOne);
+    } else {
+        if((playerOne.isTurn && playerOne.isCPU) || (playerTwo.isTurn && playerTwo.isCPU)){
+            // Trying out a small delay on CPU.
+            //setTimeout(1000, () => executeTurn(playerOne, playerTwo));
+            executeTurn(playerOne, playerTwo);
+        } else {
+            DOMControls.renderBoards(playerOne, playerTwo);
+            DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
+        }
+    }
 }
 
+function gameOver(winner, loser){
+    DOMControls.displayWinner(winner, loser);
+    DOMControls.showGameOver();
+}
 // Add event listeners for the game
 document.querySelector("#new-game").addEventListener("click", startNewGame);
+document.querySelector("#rematch").addEventListener("click", startNewGame);
+document.querySelector("#change-players").addEventListener("click", startPlayerCreation);
 
 // Make sure the page loads to the player creation screen at first
 startPlayerCreation();
@@ -451,7 +471,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    margin: auto;\n    border-radius: 1em;\n    padding: 5em;\n\n    background-color:rgba(36, 36, 36, 0.5);\n\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    font-size: 1em;\n    width: 40%;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n\n#in-game {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #242424;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    margin: auto;\n    border-radius: 1em;\n    padding: 5em;\n\n    background-color:rgba(36, 36, 36, 0.5);\n\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    font-size: 1em;\n    width: 40%;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n\n    width: 100%;\n    margin: auto;\n}\n\n#who-attacks {\n    text-align: center;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.game-board.idle {\n    border: 2px solid red;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #696969;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -813,9 +833,18 @@ const DOMControls = (() => {
         }
     }
 
+    const setBoardGrid = (numRows, numColumns) => {
+        document.querySelectorAll(".game-board").forEach(board => {
+            board.style.gridTemplateRows = `repeat(${numRows}, 1fr)`;
+            board.style.gridTemplateColumns = `repeat(${numColumns}, 1fr)`;
+        })
+    }
+
     const renderBoard = (boardElement, player) => {
         clearBoard(boardElement);
+
         if(player.isTurn){
+            document.querySelector("#who-attacks").textContent = player.name + " is attacking";
             boardElement.classList.add("active");
             boardElement.classList.remove("idle");
         } else {
@@ -846,6 +875,7 @@ const DOMControls = (() => {
                 } else {
                     tile.classList.add("unknown");
                 }
+                boardElement.appendChild(tile);
             }
         }
     }
@@ -872,18 +902,23 @@ const DOMControls = (() => {
         if(playerOne.isTurn){
             board = this.playerTwoElement.querySelector(".game-board");
             board.querySelectorAll(".tile.unknown").forEach(tile => {
-                tile.addEventListener("onclick", (event) => {
+                tile.addEventListener("click", (event) => {
                     callback(playerOne, playerTwo, event);
                 })
             })
         } else {
             board = this.playerOneElement.querySelector(".game-board");
             board.querySelectorAll(".tile.unknown").forEach(tile => {
-                tile.addEventListener("onclick", (event) => {
+                tile.addEventListener("click", (event) => {
                     callback(playerOne, playerTwo, event);
                 })
             })
         }
+    }
+
+    const displayWinner = (winner, loser) => {
+        this.gameOver.querySelector("#winner").textContent = winner.name + " wins!";
+        this.gameOver.querySelector("#loser").textContent = "Sorry, " + loser.name + "...";
     }
 
     return {
@@ -892,10 +927,12 @@ const DOMControls = (() => {
         showGameOver,
         readPlayerInput,
         clearBoard,
+        setBoardGrid,
         renderBoard,
         renderBoards,
         renderDocks,
         addAttackListeners,
+        displayWinner,
    };
 })();
 

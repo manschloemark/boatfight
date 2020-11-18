@@ -44,9 +44,18 @@ const DOMControls = (() => {
         }
     }
 
+    const setBoardGrid = (numRows, numColumns) => {
+        document.querySelectorAll(".game-board").forEach(board => {
+            board.style.gridTemplateRows = `repeat(${numRows}, 1fr)`;
+            board.style.gridTemplateColumns = `repeat(${numColumns}, 1fr)`;
+        })
+    }
+
     const renderBoard = (boardElement, player) => {
         clearBoard(boardElement);
+
         if(player.isTurn){
+            document.querySelector("#who-attacks").textContent = player.name + " is attacking";
             boardElement.classList.add("active");
             boardElement.classList.remove("idle");
         } else {
@@ -77,6 +86,7 @@ const DOMControls = (() => {
                 } else {
                     tile.classList.add("unknown");
                 }
+                boardElement.appendChild(tile);
             }
         }
     }
@@ -103,18 +113,23 @@ const DOMControls = (() => {
         if(playerOne.isTurn){
             board = this.playerTwoElement.querySelector(".game-board");
             board.querySelectorAll(".tile.unknown").forEach(tile => {
-                tile.addEventListener("onclick", (event) => {
+                tile.addEventListener("click", (event) => {
                     callback(playerOne, playerTwo, event);
                 })
             })
         } else {
             board = this.playerOneElement.querySelector(".game-board");
             board.querySelectorAll(".tile.unknown").forEach(tile => {
-                tile.addEventListener("onclick", (event) => {
+                tile.addEventListener("click", (event) => {
                     callback(playerOne, playerTwo, event);
                 })
             })
         }
+    }
+
+    const displayWinner = (winner, loser) => {
+        this.gameOver.querySelector("#winner").textContent = winner.name + " wins!";
+        this.gameOver.querySelector("#loser").textContent = "Sorry, " + loser.name + "...";
     }
 
     return {
@@ -123,10 +138,12 @@ const DOMControls = (() => {
         showGameOver,
         readPlayerInput,
         clearBoard,
+        setBoardGrid,
         renderBoard,
         renderBoards,
         renderDocks,
         addAttackListeners,
+        displayWinner,
    };
 })();
 

@@ -1,15 +1,27 @@
 const DOMControls = (() => {
 
-    this.playerCreation = document.querySelector("#player-creation");
+    this.startMenu = document.querySelector("#start-menu");
     this.inGame = document.querySelector("#in-game");
     this.gameOver = document.querySelector("#game-over");
     this.playerOneElement = document.querySelector("#player-one");
     this.playerTwoElement = document.querySelector("#player-two");
 
-    const showPlayerCreation = () => {
-        this.playerCreation.classList.remove("hidden");
+    const showStartMenu = () => {
+        this.startMenu.classList.remove("hidden");
         this.inGame.classList.add("hidden");
         this.gameOver.classList.add("hidden");
+    }
+
+    const showGameUI = () => {
+        this.inGame.classList.remove("hidden");
+        this.startMenu.classList.add("hidden");
+        this.gameOver.classList.add("hidden");
+    }
+
+    const showGameOver = () => {
+        this.gameOver.classList.remove("hidden");
+        this.inGame.classList.add("hidden");
+        this.startMenu.classList.add("hidden");
     }
 
     const readPlayerInput = () => {
@@ -28,7 +40,7 @@ const DOMControls = (() => {
 
     const clearBoard = (board) => {
         while(board.hasChildNodes()){
-            board.removeChild(boardElement.firstChild);
+            board.removeChild(board.firstChild);
         }
     }
 
@@ -72,7 +84,6 @@ const DOMControls = (() => {
     const renderBoards = (playerOne, playerTwo) => {
         const boardOne = this.playerOneElement.querySelector(".game-board");
         const boardTwo = this.playerTwoElement.querySelector(".game-board");
-        console.log(boardOne);
         renderBoard(boardOne, playerOne);
         renderBoard(boardTwo, playerTwo);
     }
@@ -107,7 +118,9 @@ const DOMControls = (() => {
     }
 
     return {
-        showPlayerCreation,
+        showStartMenu,
+        showGameUI,
+        showGameOver,
         readPlayerInput,
         clearBoard,
         renderBoard,

@@ -33,7 +33,7 @@ main div {
 /* 
     Start screen styling
 */
-#start-up {
+#start-menu {
     width: 60%;
     display: flex;
     flex-direction: column;

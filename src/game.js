@@ -12,7 +12,7 @@ function toggleTurns(playerOne, playerTwo){
     playerTwo.setTurn(playerOne.isTurn);
 }
 
-const executeTurn = (playerOne, playerTwo, event) => {
+function executeTurn(playerOne, playerTwo, event){
     let attacker, board;
     if(playerOne.isTurn){
         attacker = playerOne;
@@ -42,7 +42,7 @@ const executeTurn = (playerOne, playerTwo, event) => {
 }
 
 function startPlayerCreation(){
-    DOMControls.showPlayerCreation();
+    DOMControls.showStartMenu();
 }
 
 function startNewGame(){
@@ -59,6 +59,7 @@ function startNewGame(){
     playerOne.setTurn((Math.random() > 0.5));
     playerTwo.setTurn(! playerOne.isTurn);
 
+    DOMControls.showGameUI();
     shipPlacementTurn(playerOne, playerTwo);
 }
 
@@ -70,8 +71,6 @@ function randomShipPlacement(playerOne, playerTwo, ships){
         activePlayer = playerTwo;
     }
     activePlayer.randomizeShips(ships);
-    toggleTurns(playerOne, playerTwo);
-    shipPlacementTurn(playerOne, playerTwo);
 }
 
 function shipPlacementTurn(playerOne, playerTwo){
@@ -83,11 +82,14 @@ function shipPlacementTurn(playerOne, playerTwo){
         activePlayer = playerTwo;
     }
     if(activePlayer.ready){
-        //Done
+        // If this function is called and the player who's turn it is has already
+        // ready up'd, ship placement is now complete.
+        setupTurn(playerOne, playerTwo);
     } else {
         const ships = ShipArray.slice(0);
         if(activePlayer.isCPU){
             randomShipPlacement(playerOne, playerTwo, ships);
+            activePlayer.setReady(true);
             finishShipPlacement(playerOne, playerTwo, ships);
         } else {
             randomShipPlacement(playerOne, playerTwo, ships);
@@ -100,6 +102,7 @@ function shipPlacementTurn(playerOne, playerTwo){
             // finishShipPlacement will be passed as the callback to "Ready" when a human
             // is placing ships, so they can randomize ship placements without automatically
             // accepting it.
+            activePlayer.setReady(true);
             finishShipPlacement(playerOne, playerTwo, ships);
         }
         
@@ -114,7 +117,8 @@ function finishShipPlacement(playerOne, playerTwo, ships){
 }
 
 function setupTurn(playerOne, playerTwo){
-
+    DOMControls.renderBoards(playerOne, playerTwo);
+    DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
 }
 
 // Add event listeners for the game

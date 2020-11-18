@@ -25,7 +25,6 @@ class Player {
                 continue;
             }
         }
-        this.readyUp();
     }
 
     setReady(ready){

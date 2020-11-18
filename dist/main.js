@@ -13,54 +13,123 @@ const Player = __webpack_require__(7);
 
 const DOMControls = __webpack_require__(8);
 
-// There must be a better way to do this. But for now this is okay.
-const executeTurn = (activePlayer, inactivePlayer, event) => {
-    if(!activePlayer.isTurn){
-        return;
+const ShipArray = [2, 3, 3, 4, 5];
+
+function toggleTurns(playerOne, playerTwo){
+    playerOne.toggleTurn();
+    playerTwo.setTurn(playerOne.isTurn);
+}
+
+const executeTurn = (playerOne, playerTwo, event) => {
+    let attacker, board;
+    if(playerOne.isTurn){
+        attacker = playerOne;
+        board = playerTwo.gameboard;
+    } else {
+        attacker = playerTwo;
+        board = playerOne.gameboard;
     }
-    console.log("Shooting...");
-    let row;
-    let column;
-    let shotHit;
-    if(activePlayer.isCPU){
-        [row, column] = activePlayer.randomAttack(inactivePlayer.gameboard);
+
+    let row, column;
+    if(attacker.isCPU){
+        [row, column] = attacker.randomAttack();
     } else {
         row = event.target.dataset["row"];
         column = event.target.dataset["column"];
     }
-    shotHit = activePlayer.sendAttack(row, column, inactivePlayer.gameboard);
-    //DOMControls.revealTile(row, column, inactivePlayer.gameboard);
-    // If the attack hits, 
-    if(!shotHit){
-        activePlayer.toggleTurn();
-        inactivePlayer.toggleTurn();
-    } else if(activePlayer.isCPU){
-        executeTurn(activePlayer, inactivePlayer);
+    const attackHit = attacker.sendAttack(row, column, board);
+
+    if(attackHit){
+        //Don't swap turns
+    } else {
+        //Swap turns
+        toggleTurns(playerOne, playerTwo);
     }
-    DOMControls.refresh(executeTurn);
+    setupTurn(playerOne, playerTwo);
+
 }
 
-const playerOneShips = [5, 4, 3, 3, 2];
-const boardOne = GameBoardFactory(10, 10);
-const playerOne = new Player();
-playerOne.setGameboard(boardOne);
+function startPlayerCreation(){
+    DOMControls.showPlayerCreation();
+}
 
-const playerTwoShips = [5, 4, 3, 3, 2];
-const boardTwo = GameBoardFactory(10, 10);
-const playerTwo = new Player(true);
-playerTwo.setGameboard(boardTwo);
+function startNewGame(){
+    const [playerOneData, playerTwoData] = DOMControls.readPlayerInput();
+    const playerOne = new Player(...playerOneData);
+    const playerTwo = new Player(...playerTwoData);
 
-// TEMP
-// Randomly set ships for both players
-playerOne.randomizeShips(playerOneShips);
-playerTwo.randomizeShips(playerTwoShips);
-// Maybe make this random later
-playerOne.setTurn(true);
-playerTwo.setTurn(false);
+    const boardOne = GameBoardFactory(10, 10);
+    const boardTwo = GameBoardFactory(10, 10);
 
-//DOMControls.refresh(executeTurn);
+    playerOne.setGameboard(boardOne);
+    playerTwo.setGameboard(boardTwo);
 
+    playerOne.setTurn((Math.random() > 0.5));
+    playerTwo.setTurn(! playerOne.isTurn);
 
+    shipPlacementTurn(playerOne, playerTwo);
+}
+
+function randomShipPlacement(playerOne, playerTwo, ships){
+    let activePlayer;
+    if(playerOne.isTurn){
+        activePlayer = playerOne;
+    } else {
+        activePlayer = playerTwo;
+    }
+    activePlayer.randomizeShips(ships);
+    toggleTurns(playerOne, playerTwo);
+    shipPlacementTurn(playerOne, playerTwo);
+}
+
+function shipPlacementTurn(playerOne, playerTwo){
+    DOMControls.renderBoards(playerOne, playerTwo);
+    let activePlayer;
+    if(playerOne.isTurn){
+        activePlayer = playerOne;
+    } else {
+        activePlayer = playerTwo;
+    }
+    if(activePlayer.ready){
+        //Done
+    } else {
+        const ships = ShipArray.slice(0);
+        if(activePlayer.isCPU){
+            randomShipPlacement(playerOne, playerTwo, ships);
+            finishShipPlacement(playerOne, playerTwo, ships);
+        } else {
+            randomShipPlacement(playerOne, playerTwo, ships);
+            // Human can manually or choose to randomize ships
+            //DOMControls.renderDocks(playerOne, playerTwo, playerOneShips, playerTwoShips);
+            // In either case, the DOM should be updated to give the player a UI
+            // so they can choose.
+            // A callback will need to be passed somewhere that can handle either case.
+            // randomShipPlacement will be passed to the 'randomize ships' button
+            // finishShipPlacement will be passed as the callback to "Ready" when a human
+            // is placing ships, so they can randomize ship placements without automatically
+            // accepting it.
+            finishShipPlacement(playerOne, playerTwo, ships);
+        }
+        
+    }
+}
+
+function finishShipPlacement(playerOne, playerTwo, ships){
+    if(ships.length == 0){
+        toggleTurns(playerOne, playerTwo);
+        shipPlacementTurn(playerOne, playerTwo);
+    }
+}
+
+function setupTurn(playerOne, playerTwo){
+
+}
+
+// Add event listeners for the game
+document.querySelector("#new-game").addEventListener("click", startNewGame);
+
+// Make sure the page loads to the player creation screen at first
+startPlayerCreation();
 
 /***/ }),
 /* 1 */
@@ -634,6 +703,7 @@ class Player {
         this.isCPU = isCPU || false; // Defaults to false (human)
         this.playHistory = new Array();
         this.gameboard = null;
+        this.ready = false;
     }
 
     setGameboard(board){
@@ -653,6 +723,11 @@ class Player {
                 continue;
             }
         }
+        this.readyUp();
+    }
+
+    setReady(ready){
+        this.ready = ready;
     }
 
     setTurn(isTurn){
@@ -687,133 +762,125 @@ module.exports = Player;
 
 /***/ }),
 /* 8 */
-/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
-
-const GameBoardFactory = __webpack_require__(6);
-const Player = __webpack_require__(7);
+/***/ (function(module) {
 
 const DOMControls = (() => {
-    let playerOne, playerTwo;
 
-    this.startScreen = document.querySelector("#start-up");
-    this.endScreen = document.querySelector("#game-over");
-    this.inGameScreen = document.querySelector("#in-game");
+    this.playerCreation = document.querySelector("#player-creation");
+    this.inGame = document.querySelector("#in-game");
+    this.gameOver = document.querySelector("#game-over");
+    this.playerOneElement = document.querySelector("#player-one");
+    this.playerTwoElement = document.querySelector("#player-two");
 
-    const playerCreation = () => {
-        this.endScreen.classList.add("hidden");
-        this.inGameScreen.classList.add("hidden");
-        this.startScreen.classList.remove("hidden");
+    const showPlayerCreation = () => {
+        this.playerCreation.classList.remove("hidden");
+        this.inGame.classList.add("hidden");
+        this.gameOver.classList.add("hidden");
     }
 
-    const startGame = (event) => {
-        // Create players from each player entry
-        // Register the players so this object can easily refer to them
-        // Switch screen to the game screen
-        //  - Specifically the ship-placement screen
-        const playerEntries = document.querySelectorAll(".player-entry");
-        const players = [];
-        playerEntries.forEach(entryElement => {
-            const playerName = entryElement.querySelector("#player-name").text;
-            const isCPU = entryElement.querySelector("#is-cpu").checked;
-            players.push(new Player(isCPU, playerName));
+    const readPlayerInput = () => {
+        const playerDivs = document.querySelectorAll(".player-entry");
+        const playerData = [];
+        playerDivs.forEach(div => {
+            let name = div.querySelector(".player-name").value;
+            if(name == ''){
+                name = div.querySelector("h3").textContent;
+            }
+            let isCPU = div.querySelector(".is-cpu").checked;
+            playerData.push([isCPU, name]);
         });
-        registerPlayers(...players);
-
-        this.inGameScreen.classList.remove("hidden");
-        this.startScreen.classList.add("hidden");
+        return playerData;
     }
 
-    const registerPlayers = (pOne,pTwo) => {
-        const boardOne = GameBoardFactory(10, 10);
-        const boardTwo = GameBoardFactory(10, 10);
-        pOne.setGameboard(boardOne);
-        pTwo.setGameboard(boardTwo);
-        this.playerOne = pOne;
-        this.playerTwo = pTwo;
-    }
-
-    const gameOver = (winner, loser) => {
-        const gameOver = document.querySelector("#game-over");
-
-        gameOver.querySelector("#winner").textContent = `Player ${winner} won!`;
-        gameOver.querySelector("#loser").textContent = `Sorry Player ${loser}...`;
-        gameOver.classList.remove("hidden");
-    }
-
-    const renderBoard = (number, player) => {
-        const boardElement = document.querySelector(`#player-${number} .game-board`);
-        while(boardElement.hasChildNodes()){
-            boardElement.removeChild(boardElement.firstChild);
+    const clearBoard = (board) => {
+        while(board.hasChildNodes()){
+            board.removeChild(boardElement.firstChild);
         }
-        boardElement.style.gridTemplateRows = `repeat(${player.gameboard.height}, 1fr)`;
-        boardElement.style.gridTemplateColumns = `repeat(${player.gameboard.width}, 1fr)`;
+    }
+
+    const renderBoard = (boardElement, player) => {
+        clearBoard(boardElement);
+        if(player.isTurn){
+            boardElement.classList.add("active");
+            boardElement.classList.remove("idle");
+        } else {
+            boardElement.classList.add("idle");
+            boardElement.classList.remove("active");
+        }
         const board = player.gameboard.viewBoard();
-        for(let r = 0; r < player.gameboard.height; r++){
-            for(let c = 0; c < player.gameboard.width; c++){
+        const numRows = player.gameboard.height;
+        const numCols = player.gameboard.width;
+        for(let row = 0; row < numRows; row++){
+            for(let col = 0; col < numCols; col++){
                 let tile = document.createElement("div");
-                tile.dataset["row"] = r;
-                tile.dataset["column"] = c;
+                tile.dataset["row"] = row;
+                tile.dataset["column"] = col;
                 tile.classList.add("tile");
-                if(board[r][c]){
-                    if(board[r][c].isHit){
+                if (board[row][col]){
+                    if(board[row][col].isHit){
                         tile.classList.add("damaged");
                     } else {
-                        tile.classList.add("unknown");
+                        if (player.isTurn){
+                            tile.classList.add("ship");
+                        } else {
+                            tile.classList.add("unknown");
+                        }
                     }
-                } else if (board[r][c] === false){
+                } else if (board[row][col] === false){
                     tile.classList.add("empty");
                 } else {
                     tile.classList.add("unknown");
                 }
-                boardElement.appendChild(tile);
             }
         }
-        return boardElement;
     }
 
-    const revealTile = (row, column, board) => {
-        return
+    const renderBoards = (playerOne, playerTwo) => {
+        const boardOne = this.playerOneElement.querySelector(".game-board");
+        const boardTwo = this.playerTwoElement.querySelector(".game-board");
+        console.log(boardOne);
+        renderBoard(boardOne, playerOne);
+        renderBoard(boardTwo, playerTwo);
     }
 
-    const setupAttackListeners = (boardElement, attacker, defender, callback) => {
-        boardElement.querySelectorAll(".unknown").forEach(tile => {
-            tile.addEventListener("click", event => callback(attacker, defender, event));
-        });
-    }
-
-    const refresh = (callback) => {
-        // Initialize the board for each player
-        const boardElementOne = renderBoard("one", this.playerOne);
-        const boardElementTwo = renderBoard("two", this.playerTwo);
-
-        if(this.playerOne.gameboard.allShipsSunk()){
-            gameOver("two", "one");
-        } else if(this.playerTwo.gameboard.allShipsSunk()){
-            gameOver("one", "two");
+    const renderDocks = (playerOne, playerTwo, ships) => {
+        let dock;
+        if(playerOne.isTurn){
+            dock = this.playerOneElement.querySelector(".ship-dock");
         } else {
-            // Add listeners so player one attacks board two and player two attacks board one
-            setupAttackListeners(boardElementTwo, this.playerOne, this.playerTwo, callback);
-            if(!this.playerTwo.isCPU){
-                setupAttackListeners(boardElementOne, this.playerTwo, this.playerOne, callback);
-            } else if(this.playerTwo.isTurn){
-                callback(this.playerTwo, this.playerOne);
-            }
+            dock = this.playerTwoElement.querySelector(".ship-dock");
         }
+        dock.textContent = ships;
     }
 
-    // TESTING PURPOSES ONLY; DELETE THIS NEPHEW
-    document.querySelector("header h1").addEventListener("click", event => gameOver("test", "loser!"));
-
-    // Set up event listeners for the UI that doesn't change
-    document.querySelector("#new-game").onclick = startGame;
+    const addAttackListeners = (playerOne, playerTwo, callback) => {
+        let board;
+        if(playerOne.isTurn){
+            board = this.playerTwoElement.querySelector(".game-board");
+            board.querySelectorAll(".tile.unknown").forEach(tile => {
+                tile.addEventListener("onclick", (event) => {
+                    callback(playerOne, playerTwo, event);
+                })
+            })
+        } else {
+            board = this.playerOneElement.querySelector(".game-board");
+            board.querySelectorAll(".tile.unknown").forEach(tile => {
+                tile.addEventListener("onclick", (event) => {
+                    callback(playerOne, playerTwo, event);
+                })
+            })
+        }
+    }
 
     return {
-        registerPlayers,
-        refresh,
+        showPlayerCreation,
+        readPlayerInput,
+        clearBoard,
         renderBoard,
-        setupAttackListeners,
-        gameOver,
-    }
+        renderBoards,
+        renderDocks,
+        addAttackListeners,
+   };
 })();
 
 module.exports = DOMControls;

@@ -39,10 +39,7 @@ function executeTurn(playerOne, playerTwo, event){
     }
     const attackHit = attacker.sendAttack(row, column, board);
 
-    if(attackHit){
-        //Don't swap turns
-    } else {
-        //Swap turns
+    if(!attackHit){
         toggleTurns(playerOne, playerTwo);
     }
     setupTurn(playerOne, playerTwo);
@@ -128,14 +125,25 @@ function finishShipPlacement(playerOne, playerTwo, ships){
 
 function setupTurn(playerOne, playerTwo){
     if(playerOne.gameboard.allShipsSunk()){
-        gameOver(playerOne, playerTwo);
-    } else if (playerTwo.gameboard.allShipsSunk()){
-        gameOver(playerTwo, playerOne);
-    } else {
+        gameOver(playerOne, playerTwo, false);
+     } else if (playerTwo.gameboard.allShipsSunk()){
+         gameOver(playerOne, playerTwo, true)
+     } else {
         if((playerOne.isTurn && playerOne.isCPU) || (playerTwo.isTurn && playerTwo.isCPU)){
-            // Trying out a small delay on CPU.
-            //setTimeout(1000, () => executeTurn(playerOne, playerTwo));
-            executeTurn(playerOne, playerTwo);
+            // If both players are CPU, it's assumed that the human wants to watch
+            // the CPU's 'simulate' a game, so the boards are drawn and the CPU's take
+            // a half a second to attack.
+            // In a human vs CPU battle, I assume the player doesn't care to
+            // watch the CPU attack, and the board is not rendered for CPU turns.
+            if(playerOne.isCPU && playerTwo.isCPU){
+                DOMControls.renderBoards(playerOne, playerTwo);
+                setTimeout(() => {
+                    executeTurn(playerOne, playerTwo)
+                }, 500);
+            } else {
+                executeTurn(playerOne, playerTwo);
+            }
+            //executeTurn(playerOne, playerTwo);
         } else {
             DOMControls.renderBoards(playerOne, playerTwo);
             DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
@@ -143,8 +151,22 @@ function setupTurn(playerOne, playerTwo){
     }
 }
 
-function gameOver(winner, loser){
-    DOMControls.displayWinner(winner, loser);
+// the parameter 'playerOneWins' is only used so I can a) keep the order of players
+// consistent in gameOver's arguments without needing to call allShipsSunk again.
+// So I can just check playerOneWins to determine what to do in here.
+function gameOver(playerOne, playerTwo, playerOneWins){
+    // Set both players isTurn to true so the renderBoards method displays all info.
+    // There's no need to hide the idle players ships since the game is over.
+    // There's probably a more elegant way to address this, but for now this is quick
+    // and easy.
+    playerOne.setTurn(true);
+    playerTwo.setTurn(true);
+    DOMControls.renderBoards(playerOne, playerTwo);
+    if(playerOneWins){
+        DOMControls.displayWinner(playerOne, playerTwo);
+    } else {
+        DOMControls.displayWinner(playerTwo, playerOne);
+    }
     DOMControls.showGameOver();
 }
 // Add event listeners for the game
@@ -471,7 +493,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    margin: auto;\n    border-radius: 1em;\n    padding: 5em;\n\n    background-color:rgba(36, 36, 36, 0.5);\n\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    font-size: 1em;\n    width: 40%;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n\n    width: 100%;\n    margin: auto;\n}\n\n#who-attacks {\n    text-align: center;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.game-board.idle {\n    border: 2px solid red;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #696969;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n\n    width: 100%;\n    margin: auto;\n}\n\n#who-attacks {\n    text-align: center;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    gap: 2px;\n    place-content: center center;\n}\n\n.game-board.idle {\n    border: 2px solid red;\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    color: white;\n}\n\n.tile.unknown {\n}\n\n.game-board .tile.unknown:hover {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #696969;\n}\n\n.tile.damaged {\n    background-color: rgba(255, 0, 0, 0.672);\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -809,8 +831,6 @@ const DOMControls = (() => {
 
     const showGameOver = () => {
         this.gameOver.classList.remove("hidden");
-        this.inGame.classList.add("hidden");
-        this.startMenu.classList.add("hidden");
     }
 
     const readPlayerInput = () => {

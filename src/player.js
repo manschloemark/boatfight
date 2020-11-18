@@ -5,6 +5,7 @@ class Player {
         this.isCPU = isCPU || false; // Defaults to false (human)
         this.playHistory = new Array();
         this.gameboard = null;
+        this.ready = false;
     }
 
     setGameboard(board){
@@ -24,6 +25,11 @@ class Player {
                 continue;
             }
         }
+        this.readyUp();
+    }
+
+    setReady(ready){
+        this.ready = ready;
     }
 
     setTurn(isTurn){

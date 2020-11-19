@@ -30,14 +30,15 @@ function executeTurn(playerOne, playerTwo, event){
         board = playerOne.gameboard;
     }
 
-    let row, column;
+    let attackHit;
     if(attacker.isCPU){
-        [row, column] = attacker.randomAttack(board);
+        attackHit = attacker.randomAttack(board);
     } else {
-        row = event.target.dataset["row"];
-        column = event.target.dataset["column"];
+        let row = event.target.dataset["row"];
+        let column = event.target.dataset["column"];
+        attackHit = attacker.sendAttack(row, column, board);
     }
-    const attackHit = attacker.sendAttack(row, column, board);
+    
 
     if(!attackHit){
         toggleTurns(playerOne, playerTwo);
@@ -139,7 +140,7 @@ function setupTurn(playerOne, playerTwo){
                 DOMControls.renderBoards(playerOne, playerTwo);
                 setTimeout(() => {
                     executeTurn(playerOne, playerTwo)
-                }, 500);
+                }, 400);
             } else {
                 executeTurn(playerOne, playerTwo);
             }
@@ -750,6 +751,14 @@ class Player {
         this.playHistory = new Array();
         this.gameboard = null;
         this.ready = false;
+
+        if(this.isCPU){
+            //this.enemyShips = ShipArray.slice(0)
+            this.lastHit = {
+                coords: null,
+                //direction: null
+            }
+        }
     }
 
     setGameboard(board){
@@ -784,16 +793,38 @@ class Player {
     }
 
     randomAttack(gameboard){
-        // Use this.gameboard for width and height because a player's
-        // board will be the same size as the opponent's.
-        let row = Math.floor(Math.random() * gameboard.height);
-        let column = Math.floor(Math.random() * gameboard.width);
+        let row, column;
+        if(this.lastHit.coords){
+            [row, column] = this.lastHit.coords;
+            if(!(row == 0 || this.playHistory.includes([row - 1, column].join("")))){
+                row -= 1;
+            } else if(!(row + 1 == gameboard.height || this.playHistory.includes([row + 1, column].join("")))){
+                row += 1
+            } else if(!(column == 0 || this.playHistory.includes([row, column - 1].join("")))){
+                column -= 1;
+            } else if(!(column + 1 == gameboard.height || this.playHistory.includes([row, column + 1].join("")))){
+                column += 1;
+            } else {
+            // For now, if you make it through the 4 previous checks without
+            // hitting something, just move on.
+                this.lastHit.coords = null;
+                row = Math.floor(Math.random() * gameboard.height);
+                column = Math.floor(Math.random() * gameboard.width);
+            }
+        } else {
+            row = Math.floor(Math.random() * gameboard.height);
+            column = Math.floor(Math.random() * gameboard.width);
+        }
         while (this.playHistory.includes([row, column].join(""))){
             row = Math.floor(Math.random() * gameboard.height);
             column = Math.floor(Math.random() * gameboard.width);
         }
+        const hit =  this.sendAttack(row, column, gameboard);
+        if(hit){
+            this.lastHit.coords = [row, column];
+        }
 
-        return [row, column];
+        return hit;
     }
 
     sendAttack(row, column, targetBoard){
@@ -986,6 +1017,8 @@ const DOMControls = (() => {
     const displayWinner = (winner, loser) => {
         this.gameOver.querySelector("#winner").textContent = winner.name + " wins!";
         this.gameOver.querySelector("#loser").textContent = "Sorry, " + loser.name + "...";
+        this.gameOver.querySelector("#winner-stats").textContent = `${winner.name} took ${winner.playHistory.length} shots`;
+        this.gameOver.querySelector("#loser-stats").textContent = `${loser.name} took ${loser.playHistory.length} shots`;
     }
 
     return {

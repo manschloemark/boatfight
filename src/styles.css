@@ -89,7 +89,7 @@ button {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-
+    flex-wrap: wrap;
     width: 100%;
     margin: auto;
 }
@@ -105,12 +105,11 @@ button {
 .game-board {
     background-color: #242424;
     display: grid;
-    gap: 2px;
+    /* gap: 2px; */
     place-content: center center;
 }
 
 .game-board.idle {
-    border: 2px solid red;
 }
 
 .tile {
@@ -120,14 +119,11 @@ button {
     text-align: center;
     font-size: 18pt;
     font-family: monospace;
-    color: white;
-}
-
-.tile.unknown {
+    border: 1px solid #242424;
 }
 
 .game-board .tile.unknown:hover {
-    background-color: rgba(255, 0, 0, 0.672);
+    background-color: #a00000;
 }
 
 .tile.empty {
@@ -136,10 +132,28 @@ button {
 
 .tile.ship {
     background-color: #696969;
+    /* border: 1px solid #696969; */
 }
 
 .tile.damaged {
-    background-color: rgba(255, 0, 0, 0.672);
+    background-color: #a00000;
+    /* border: 1px solid #a00000; */
+}
+
+.tile.up-one {
+    border-top: 1px dashed #242424;
+}
+
+.tile.down-one {
+    border-bottom: 1px dashed #242424;
+}
+
+.tile.right-one {
+    border-right: 1px dashed #242424;
+}
+
+.tile.left-one {
+    border-left: 1px dashed #242424;
 }
 
 .hidden {

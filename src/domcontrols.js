@@ -72,9 +72,56 @@ const DOMControls = (() => {
                 if (board[row][col]){
                     if(board[row][col].isHit){
                         tile.classList.add("damaged");
+                            // Ugly but gets the job done.
+                            // Adds classes to damaged ships that tell where in the grid the other
+                            // parts of the ship are located so I can style them differently.
+                            // I suppose this wouldn't be necessary if gave GameBoard objects
+                            // attributes that make it easier to tell where the rest of a ship is
+                            // located.
+                            try{
+                                if((board[row-1][col] && player.isTurn) || board[row-1][col].isHit){
+                                    tile.classList.add("up-one");
+                                }
+                            } catch (e) {}
+                            try{
+                                if((board[row+1][col] && player.isTurn) || board[row+1][col].isHit){
+                                    tile.classList.add("down-one")
+                                }
+                            } catch (e) {}
+                            try{
+                                if((board[row][col+1] && player.isTurn) || board[row][col+1].isHit){
+                                    tile.classList.add("right-one");
+                                }
+                            } catch (e) {}
+                            try{
+                                if((board[row][col-1] && player.isTurn) || board[row][col-1].isHit){
+                                    tile.classList.add("left-one");
+                                }
+                            } catch (e) {}
                     } else {
                         if (player.isTurn){
                             tile.classList.add("ship");
+                            // Ugly! But gets the job done, for now.
+                            try{
+                                if(board[row-1][col]){
+                                    tile.classList.add("up-one");
+                                }
+                            } catch (e) {}
+                            try{
+                                if(board[row+1][col]){
+                                    tile.classList.add("down-one")
+                                }
+                            } catch (e) {}
+                            try{
+                                if(board[row][col+1]){
+                                    tile.classList.add("right-one");
+                                }
+                            } catch (e) {}
+                            try{
+                                if(board[row][col-1]){
+                                    tile.classList.add("left-one");
+                                }
+                            } catch (e) {}
                         } else {
                             tile.classList.add("unknown");
                         }

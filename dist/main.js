@@ -32,7 +32,7 @@ function executeTurn(playerOne, playerTwo, event){
 
     let attackHit;
     if(attacker.isCPU){
-        attackHit = attacker.randomAttack(board);
+        attackHit = attacker.cpuAttack(board);
     } else {
         let row = event.target.dataset["row"];
         let column = event.target.dataset["column"];
@@ -136,15 +136,15 @@ function setupTurn(playerOne, playerTwo){
             // a half a second to attack.
             // In a human vs CPU battle, I assume the player doesn't care to
             // watch the CPU attack, and the board is not rendered for CPU turns.
-            if(playerOne.isCPU && playerTwo.isCPU){
-                DOMControls.renderBoards(playerOne, playerTwo);
-                setTimeout(() => {
-                    executeTurn(playerOne, playerTwo)
-                }, 400);
-            } else {
-                executeTurn(playerOne, playerTwo);
-            }
-            //executeTurn(playerOne, playerTwo);
+            // if(playerOne.isCPU && playerTwo.isCPU){
+            //     DOMControls.renderBoards(playerOne, playerTwo);
+            //     setTimeout(() => {
+            //         executeTurn(playerOne, playerTwo)
+            //     }, 500);
+            // } else {
+            //     executeTurn(playerOne, playerTwo);
+            // }
+            executeTurn(playerOne, playerTwo);
         } else {
             DOMControls.renderBoards(playerOne, playerTwo);
             DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
@@ -756,8 +756,10 @@ class Player {
             //this.enemyShips = ShipArray.slice(0)
             this.lastHit = {
                 coords: null,
-                //direction: null
+                horizontal: null,
+                backtracked: false,
             }
+            this.enemyShipsRemaining = [5, 4, 3, 3, 2]; // Ugly to hard-code this
         }
     }
 
@@ -774,7 +776,6 @@ class Player {
                 this.gameboard.placeShip(r, c, unplacedShips[0], horizontal);
                 unplacedShips.shift();
             } catch (e) {
-                console.log("Random ship placement failed");
                 continue;
             }
         }
@@ -792,39 +793,148 @@ class Player {
         this.isTurn = !this.isTurn;
     }
 
-    randomAttack(gameboard){
+    // This function ended up being uglier than I anticipated.
+    // It can for sure be split up into two functions - getSmartCoords and getRandomCoords
+    // If this.lastHit.coords != null, try to get coordinates from getSmartCoords.
+    // getSmartCoords can generate coords based around this.lastHit.coords, but if all surrounding tiles are invalid,
+    // return null.
+
+    // If this.lastHit.coords is null OR the value returned by getSmartCoords is null, use getRandomCoords instead.
+    // getRandomCoords will be the same as randomAttack but will return [row, column] instead of attacking the gameboard
+
+    // cpuAttack will the call sendAttack with the given coordinates and will handle this.lastHit.coords and such
+    // Though now that I think about it, how would I handle the horizontal flag? cpuAttack will not know if
+    // coords returned from getSmartCoords are up down left or right without doing extra calculations.
+    // And getSmartCoords will not know if the attack hits, so it shouldn't set the horizontal flag.
+
+    // One solution is indeed setting the horizontal flag in getSmartCoords, and then having cpuAttack change it to
+    // null if the attack missed, but leaving it alone if it is a hit. That would work, but it feels weird and can't be
+    // a good idea.
+    cpuAttack(gameboard){
         let row, column;
-        if(this.lastHit.coords){
-            [row, column] = this.lastHit.coords;
-            if(!(row == 0 || this.playHistory.includes([row - 1, column].join("")))){
-                row -= 1;
-            } else if(!(row + 1 == gameboard.height || this.playHistory.includes([row + 1, column].join("")))){
-                row += 1
-            } else if(!(column == 0 || this.playHistory.includes([row, column - 1].join("")))){
-                column -= 1;
-            } else if(!(column + 1 == gameboard.height || this.playHistory.includes([row, column + 1].join("")))){
-                column += 1;
+        let attackHit = null;
+        if(this.lastHit.coords != null){
+            if(this.enemyShipsRemaining[0] == this.lastHit.coords.length){
+                this.enemyShipsRemaining.shift();
             } else {
-            // For now, if you make it through the 4 previous checks without
-            // hitting something, just move on.
-                this.lastHit.coords = null;
-                row = Math.floor(Math.random() * gameboard.height);
-                column = Math.floor(Math.random() * gameboard.width);
+                [row, column] = this.lastHit.coords[0].split(' ');
+                row = parseInt(row);
+                column = parseInt(column);
+                if(this.lastHit.horizontal || this.lastHit.horizontal === null){
+                    // Try attacking the left if you haven't already
+                    if(!(column == 0 || this.playHistory.includes([row, column - 1].join("")))){
+                        attackHit = this.sendAttack(row, column - 1, gameboard);
+                        if(attackHit){
+                            this.lastHit.coords.unshift([row, column - 1].join(' '));
+                            this.lastHit.horizontal = true;
+                        }
+                    // otherwise try attacking to the right if you haven't already
+                    } else if(!(column + 1 == gameboard.height || this.playHistory.includes([row, column + 1].join("")))){
+                        attackHit = this.sendAttack(row, column + 1, gameboard);
+                        if(attackHit){
+                            this.lastHit.coords.unshift([row, column + 1].join(' '));
+                            this.lastHit.horizontal = true;
+                        }
+                    } else if(this.lastHit.horizontal && this.lastHit.backtracked === false){
+                        // This branch handles the event where you KNOW the current ship is horizontal
+                        // and you have reached a dead end.
+                        // Here backTrackColumn is used to find the next end that is still in the grid and has not been
+                        // attacked.
+                        // First checks left, then checks right.
+
+                        // This is pretty darn ugly, but it guarantees that the CPU will finish every ship it starts
+                        // attacking.
+
+                        // However, it also guarantees it will always fire an extra shot for every ship.
+                        let backTrackColumn = column - 1;
+                        // If the tile to the left of the current tile was a hit, that means your most recent shot
+                        // was to the right and was a miss.
+                        // So you want to access this.lastHit.coords to find the first shot from the sequence and shoot to
+                        // the left.
+                        // If the tile to the left is not in lastHit.coords at all, that means you want to check all the way
+                        // to the right
+                        if(this.lastHit.coords.includes([row, backTrackColumn].join(' '))){
+                            backTrackColumn = parseInt(this.lastHit.coords.slice(-1)[0].split(' ')[1]) - 1;
+                        } else {
+                            backTrackColumn = parseInt(this.lastHit.coords.slice(-1)[0].split(' ')[1]) + 1;
+                        }
+                        // If the opposite side's tile is already attacked, this ship is sunk, so you want to move on
+                        if(backTrackColumn >= 0 && backTrackColumn < gameboard.width && !this.playHistory.includes([row, backTrackColumn].join(""))){
+                            attackHit = this.sendAttack(row, backTrackColumn, gameboard);
+                            this.lastHit.backtracked = true;
+                            if(attackHit){
+                                this.lastHit.coords.push([row, backTrackColumn].join(' '));
+                                this.lastHit.coords.reverse();
+                            }
+                        }
+                    }
+                }
+                // If the current target is not horizontally placed AND you have not fired an attack yet
+                if(!this.lastHit.horizontal && attackHit === null){
+                    // Try attacking above if you haven't already
+                    if(!(row == 0 || this.playHistory.includes([row - 1, column].join("")))){
+                        attackHit = this.sendAttack(row - 1, column, gameboard);
+                        if(attackHit){
+                            this.lastHit.coords.unshift([row - 1, column].join(' '));
+                            this.lastHit.horizontal = false;
+                        }
+                    // otherwise try attacking below if you haven't already
+                    } else if(!(row + 1 == gameboard.height || this.playHistory.includes([row + 1, column].join("")))){
+                        attackHit = this.sendAttack(row + 1, column, gameboard);
+                        if(attackHit){
+                            this.lastHit.coords.unshift([row + 1, column].join(' '));
+                            this.lastHit.horizontal = false;
+                        }
+                    } else if(this.lastHit.horizontal === false && this.lastHit.backtracked === false){
+                        // If you cannot attack directly above or below, try attacking the opposite end of the current line.
+                        // If it is a miss, then you know that the ship targeted by lastHit is fully sunk.
+                        let backTrackRow = row - 1;
+                        if(this.lastHit.coords.includes([backTrackRow, column].join(' '))){
+                            backTrackRow = parseInt(this.lastHit.coords.slice(-1)[0].split(' ')[0]) - 1;
+                        } else {
+                            backTrackRow =parseInt(this.lastHit.coords.slice(-1)[0].split(' ')[0]) + 1;
+                        }
+                        if(backTrackRow >= 0 && backTrackRow < gameboard.height && 
+                                !this.playHistory.includes([backTrackRow, column].join(""))){
+                            attackHit = this.sendAttack(backTrackRow, column, gameboard);
+                            this.lastHit.backtracked = true;
+                            if(attackHit){
+                                this.lastHit.coords.push([backTrackRow, column].join(' '));
+                                this.lastHit.coords.reverse();
+                            }
+                        }
+                    }
+                }
             }
-        } else {
-            row = Math.floor(Math.random() * gameboard.height);
-            column = Math.floor(Math.random() * gameboard.width);
         }
+            // If you made it through the code above and attackHit is still null, attack randomly.
+        if(attackHit === null){
+            if(this.lastHit.backtracked){
+                this.enemyShipsRemaining.splice(this.enemyShipsRemaining.indexOf(this.lastHit.coords.length));
+            }
+            // For now, if you make it through the 4 previous and can't take a shot, that means you have already
+            // shot all of the surrounding tiles.
+            // Reset lastHit
+            this.lastHit.coords = null;
+            this.lastHit.horizontal = null;
+            this.lastHit.backtracked = false;
+            attackHit = this.randomAttack(gameboard);
+        }
+        return attackHit;
+    }
+
+    randomAttack(gameboard){
+        let row = Math.floor(Math.random() * gameboard.height);
+        let column = Math.floor(Math.random() * gameboard.width);
         while (this.playHistory.includes([row, column].join(""))){
             row = Math.floor(Math.random() * gameboard.height);
             column = Math.floor(Math.random() * gameboard.width);
         }
-        const hit =  this.sendAttack(row, column, gameboard);
-        if(hit){
-            this.lastHit.coords = [row, column];
+        const attackHit = this.sendAttack(row, column, gameboard);
+        if(attackHit){
+            this.lastHit.coords = [[row, column].join(" ")];
         }
-
-        return hit;
+        return attackHit;
     }
 
     sendAttack(row, column, targetBoard){
@@ -1017,8 +1127,8 @@ const DOMControls = (() => {
     const displayWinner = (winner, loser) => {
         this.gameOver.querySelector("#winner").textContent = winner.name + " wins!";
         this.gameOver.querySelector("#loser").textContent = "Sorry, " + loser.name + "...";
-        this.gameOver.querySelector("#winner-stats").textContent = `${winner.name} took ${winner.playHistory.length} shots`;
-        this.gameOver.querySelector("#loser-stats").textContent = `${loser.name} took ${loser.playHistory.length} shots`;
+        this.gameOver.querySelector("#winner-stats").textContent = `${winner.name} fired ${winner.playHistory.length} shots`;
+        this.gameOver.querySelector("#loser-stats").textContent = `${loser.name} fired ${loser.playHistory.length} shots`;
     }
 
     return {

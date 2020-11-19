@@ -24,7 +24,7 @@ function executeTurn(playerOne, playerTwo, event){
 
     let attackHit;
     if(attacker.isCPU){
-        attackHit = attacker.randomAttack(board);
+        attackHit = attacker.cpuAttack(board);
     } else {
         let row = event.target.dataset["row"];
         let column = event.target.dataset["column"];
@@ -128,15 +128,15 @@ function setupTurn(playerOne, playerTwo){
             // a half a second to attack.
             // In a human vs CPU battle, I assume the player doesn't care to
             // watch the CPU attack, and the board is not rendered for CPU turns.
-            if(playerOne.isCPU && playerTwo.isCPU){
-                DOMControls.renderBoards(playerOne, playerTwo);
-                setTimeout(() => {
-                    executeTurn(playerOne, playerTwo)
-                }, 400);
-            } else {
-                executeTurn(playerOne, playerTwo);
-            }
-            //executeTurn(playerOne, playerTwo);
+            // if(playerOne.isCPU && playerTwo.isCPU){
+            //     DOMControls.renderBoards(playerOne, playerTwo);
+            //     setTimeout(() => {
+            //         executeTurn(playerOne, playerTwo)
+            //     }, 500);
+            // } else {
+            //     executeTurn(playerOne, playerTwo);
+            // }
+            executeTurn(playerOne, playerTwo);
         } else {
             DOMControls.renderBoards(playerOne, playerTwo);
             DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);

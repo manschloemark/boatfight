@@ -22,14 +22,15 @@ function executeTurn(playerOne, playerTwo, event){
         board = playerOne.gameboard;
     }
 
-    let row, column;
+    let attackHit;
     if(attacker.isCPU){
-        [row, column] = attacker.randomAttack(board);
+        attackHit = attacker.randomAttack(board);
     } else {
-        row = event.target.dataset["row"];
-        column = event.target.dataset["column"];
+        let row = event.target.dataset["row"];
+        let column = event.target.dataset["column"];
+        attackHit = attacker.sendAttack(row, column, board);
     }
-    const attackHit = attacker.sendAttack(row, column, board);
+    
 
     if(!attackHit){
         toggleTurns(playerOne, playerTwo);
@@ -131,7 +132,7 @@ function setupTurn(playerOne, playerTwo){
                 DOMControls.renderBoards(playerOne, playerTwo);
                 setTimeout(() => {
                     executeTurn(playerOne, playerTwo)
-                }, 500);
+                }, 400);
             } else {
                 executeTurn(playerOne, playerTwo);
             }

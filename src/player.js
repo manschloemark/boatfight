@@ -6,6 +6,14 @@ class Player {
         this.playHistory = new Array();
         this.gameboard = null;
         this.ready = false;
+
+        if(this.isCPU){
+            //this.enemyShips = ShipArray.slice(0)
+            this.lastHit = {
+                coords: null,
+                //direction: null
+            }
+        }
     }
 
     setGameboard(board){
@@ -40,16 +48,38 @@ class Player {
     }
 
     randomAttack(gameboard){
-        // Use this.gameboard for width and height because a player's
-        // board will be the same size as the opponent's.
-        let row = Math.floor(Math.random() * gameboard.height);
-        let column = Math.floor(Math.random() * gameboard.width);
+        let row, column;
+        if(this.lastHit.coords){
+            [row, column] = this.lastHit.coords;
+            if(!(row == 0 || this.playHistory.includes([row - 1, column].join("")))){
+                row -= 1;
+            } else if(!(row + 1 == gameboard.height || this.playHistory.includes([row + 1, column].join("")))){
+                row += 1
+            } else if(!(column == 0 || this.playHistory.includes([row, column - 1].join("")))){
+                column -= 1;
+            } else if(!(column + 1 == gameboard.height || this.playHistory.includes([row, column + 1].join("")))){
+                column += 1;
+            } else {
+            // For now, if you make it through the 4 previous checks without
+            // hitting something, just move on.
+                this.lastHit.coords = null;
+                row = Math.floor(Math.random() * gameboard.height);
+                column = Math.floor(Math.random() * gameboard.width);
+            }
+        } else {
+            row = Math.floor(Math.random() * gameboard.height);
+            column = Math.floor(Math.random() * gameboard.width);
+        }
         while (this.playHistory.includes([row, column].join(""))){
             row = Math.floor(Math.random() * gameboard.height);
             column = Math.floor(Math.random() * gameboard.width);
         }
+        const hit =  this.sendAttack(row, column, gameboard);
+        if(hit){
+            this.lastHit.coords = [row, column];
+        }
 
-        return [row, column];
+        return hit;
     }
 
     sendAttack(row, column, targetBoard){

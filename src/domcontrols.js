@@ -175,8 +175,8 @@ const DOMControls = (() => {
     const displayWinner = (winner, loser) => {
         this.gameOver.querySelector("#winner").textContent = winner.name + " wins!";
         this.gameOver.querySelector("#loser").textContent = "Sorry, " + loser.name + "...";
-        this.gameOver.querySelector("#winner-stats").textContent = `${winner.name} took ${winner.playHistory.length} shots`;
-        this.gameOver.querySelector("#loser-stats").textContent = `${loser.name} took ${loser.playHistory.length} shots`;
+        this.gameOver.querySelector("#winner-stats").textContent = `${winner.name} fired ${winner.playHistory.length} shots`;
+        this.gameOver.querySelector("#loser-stats").textContent = `${loser.name} fired ${loser.playHistory.length} shots`;
     }
 
     return {

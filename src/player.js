@@ -36,14 +36,28 @@ class Player {
         this.setShipArray(newShipArray);
     }
 
+    positionShip(row, column, shipSize, horizontal){
+        try{
+            let shipIndex = this.unplacedShips.indexOf(shipSize);
+            if(shipIndex == -1){
+                let shipError = new Error("Player does not have ship of size " + shipSize);
+                shipError.name = "ShipError";
+                throw shipError;
+            }
+            this.gameboard.placeShip(row, column, this.unplacedShips[shipIndex], horizontal);
+            this.unplacedShips.splice(shipIndex, 1);
+        } catch (e) {
+            throw e;
+        }
+    }
+
     randomizeShips(){
         while(this.unplacedShips.length != 0){
             try {
                 let r = Math.floor(Math.random() * this.gameboard.height);
                 let c = Math.floor(Math.random() * this.gameboard.width);
                 let horizontal = Math.random() > 0.5;
-                this.gameboard.placeShip(r, c, this.unplacedShips[0], horizontal);
-                this.unplacedShips.shift();
+                this.positionShip(r, c, this.unplacedShips[0], horizontal);
             } catch (e) {
                 continue;
             }

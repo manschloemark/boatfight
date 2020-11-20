@@ -34,8 +34,9 @@ main div {
 button {
     font-size: 1em;
     height: 2em;
-    background-color: rgba(240, 240, 240, 0.5);
-    border: 2px solid rgba(200, 200, 200, 0.5);
+    background-color: rgba(240, 240, 240, 0.8);
+    color: black;
+    border: 2px solid rgba(200, 200, 200, 0.9);
     border-radius: 6px;
 }
 /* 
@@ -120,8 +121,8 @@ button {
 
 
 .tile {
-    width: 64px;
-    height: 64px;
+    /* width: 64px;
+    height: 64px; */
     background-color: #244288;
     text-align: center;
     font-size: 18pt;
@@ -163,6 +164,14 @@ button {
     border-left: 1px dashed #242424;
 }
 
+.tile.valid-ship-placement {
+    background-color: #24aa24;
+}
+
+.tile.invalid-ship-placement {
+    background-color: #aa2424;
+}
+
 .ship-dock {
     height: 10%;
     display: flex;
@@ -177,15 +186,19 @@ button {
 
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .ship-placement-controls {
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
+    justify-content: space-around;
 }
 
 .placeable-ship {
-    background-color: #eaeaea;
+    background-color: #696969;
 }
 
 .hidden {

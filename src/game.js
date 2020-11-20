@@ -21,7 +21,7 @@ function executeTurn(playerOne, playerTwo, event){
         attacker = playerTwo;
         board = playerOne.gameboard;
     }
-
+    console.log(attacker.name + " is attacking...");
     let attackHit;
     if(attacker.isCPU){
         attackHit = attacker.cpuAttack(board);
@@ -67,10 +67,6 @@ function startNewGame(){
     shipPlacementTurn(playerOne, playerTwo);
 }
 
-function manualShipPlacement(playerOne, playerTwo, shipSize, event) {
-    return;
-}
-
 function resetShips(playerOne, playerTwo){
     let activePlayer;
     if(playerOne.isTurn){
@@ -80,6 +76,24 @@ function resetShips(playerOne, playerTwo){
     }
     activePlayer.clearBoard();
     DOMControls.renderBoards(playerOne, playerTwo);
+}
+
+function manualShipPlacement(playerOne, playerTwo, row, column, shipSize, horizontal) {
+    let activePlayer;
+    if(playerOne.isTurn){
+        activePlayer = playerOne;
+    } else {
+        activePlayer = playerTwo;
+    }
+    try{
+        activePlayer.positionShip(row, column, shipSize, horizontal);
+    } catch (e) {
+        if(e.name != "RangeError" || e.name != "ShipError"){
+            throw e;
+        }
+    }
+    DOMControls.renderBoards(playerOne, playerTwo);
+    DOMControls.renderDocks(playerOne, playerTwo, manualShipPlacement, resetShips, randomShipPlacement, finishShipPlacement);
 }
 
 function randomShipPlacement(playerOne, playerTwo){
@@ -111,6 +125,7 @@ function shipPlacementTurn(playerOne, playerTwo){
             // Human can manually or choose to randomize ships
             DOMControls.renderBoards(playerOne, playerTwo);
             DOMControls.renderDocks(playerOne, playerTwo, manualShipPlacement, resetShips, randomShipPlacement, finishShipPlacement);
+            DOMControls.addShipPlacementListeners(playerOne, playerTwo, manualShipPlacement);
             // In either case, the DOM should be updated to give the player a UI
             // so they can choose.
             // A callback will need to be passed somewhere that can handle either case.

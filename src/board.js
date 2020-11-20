@@ -55,7 +55,7 @@ const GameBoardFactory = (rows, columns) => {
         const coordinateArray = getCoordinateArray(row, column, shipSize, horizontal);
         // Check each coordinate to ensure the ship can be placed
         if(coordinateArray.some(coordinates => !validateCoordinates(...coordinates))){
-            throw new Error("Could not place ship. Ships cannot be within one tile of existing ships.")
+            throw new RangeError("Could not place ship. Ships cannot be within one tile of existing ships.")
         }
         const newShip = ShipFactory(shipSize);
         const shipIndex = ships.length;

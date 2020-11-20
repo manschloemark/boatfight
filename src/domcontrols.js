@@ -5,8 +5,8 @@ const DOMControls = (() => {
     this.gameOver = document.querySelector("#game-over");
     this.playerOneElement = document.querySelector("#player-one");
     this.playerTwoElement = document.querySelector("#player-two");
-    this.tileHeight = document.documentElement.clientHeight;
-    
+    //this.tileHeight = document.documentElement.clientHeight / 20;
+
     const showStartMenu = () => {
         this.startMenu.classList.remove("hidden");
         this.inGame.classList.add("hidden");
@@ -37,9 +37,9 @@ const DOMControls = (() => {
         return playerData;
     }
 
-    const clearBoard = (board) => {
-        while(board.hasChildNodes()){
-            board.removeChild(board.firstChild);
+    const clearContainer = (container) => {
+        while(container.hasChildNodes()){
+            container.removeChild(container.firstChild);
         }
     }
 
@@ -51,8 +51,8 @@ const DOMControls = (() => {
     }
 
     const renderBoard = (boardElement, player) => {
-        clearBoard(boardElement);
-        this.tileSize = document.documentElement.clientHeight / 10;
+        clearContainer(boardElement);
+        this.tileSize = document.documentElement.clientHeight / 18;
         if(player.isTurn){
             document.querySelector("#who-attacks").textContent = player.name + " is attacking";
             boardElement.classList.add("active");
@@ -67,6 +67,8 @@ const DOMControls = (() => {
         for(let row = 0; row < numRows; row++){
             for(let col = 0; col < numCols; col++){
                 let tile = document.createElement("div");
+                tile.style.width = this.tileSize + "px";
+                tile.style.height = this.tileSize + "px";
                 tile.dataset["row"] = row;
                 tile.dataset["column"] = col;
                 tile.classList.add("tile");
@@ -163,8 +165,8 @@ const DOMControls = (() => {
             shortSide = "width";
             longSide = "height";
         }
-        ship.style[shortSide] = "10em";
-        ship.style[longSide] = (10 * parseInt(ship.dataset["size"])) + "em";
+        ship.style[shortSide] = this.tileSize + "px";
+        ship.style[longSide] = (this.tileSize * parseInt(ship.dataset["size"])) + "px";
     }
 
     const renderShips = (playerOne, playerTwo, container, callback) => {
@@ -181,15 +183,19 @@ const DOMControls = (() => {
         const ships = activePlayer.getUnplacedShips();
         for(let i = 0; i < ships.length; i++){
             let shipElement = document.createElement("div");
+            shipElement.draggable = true;
             shipElement.dataset["size"] = ships[i];
             shipElement.dataset["horizontal"] = false;
             shipElement.classList.add("placeable-ship");
-            shipElement.style.height = 1 * ships[i] + 'em';
-            shipElement.style.width = '1em';
+            shipElement.style.height = this.tileSize * ships[i] + 'px';
+            shipElement.style.width = this.tileSize + 'px';
             shipElement.addEventListener("click", event => {
                 rotateShip(event);
             });
             shipElement.addEventListener("drag", event  => {});
+            shipElement.addEventListener("dragstart", event => {
+                draggedShip = event.target;
+            })
             //shipElement.addEventListener("ondrag");
             container.appendChild(shipElement);
         }
@@ -199,16 +205,18 @@ const DOMControls = (() => {
         let dock, ships;
         if(playerOne.isTurn){
             ships = playerOne.unplacedShips;
+            grid = this.playerOneElement.querySelector(".game-board");
             dock = this.playerOneElement.querySelector(".ship-dock");
             this.playerTwoElement.querySelector(".ship-dock").classList.add("idle");
         } else {
             ships = playerTwo.unplacedShips;
+            grid = this.playerTwoElement.querySelector(".game-board");
             dock = this.playerTwoElement.querySelector(".ship-dock");
             this.playerOneElement.querySelector(".ship-dock").classList.add("idle");
         }
         dock.classList.remove("hidden");
         container = dock.querySelector(".ship-container");
-
+        clearContainer(container);
         dock.querySelector(".reset-ships").addEventListener("click", (event) => {
             resetCB(playerOne, playerTwo);
         })
@@ -221,7 +229,59 @@ const DOMControls = (() => {
         // Instead of text content I'll have to make DOM elements for each ship in the array.
         // These elements should be able to be dragged on the player's board and dropped in place.
         renderShips(playerOne, playerTwo, container, dragNDropCB);
-        //container.textContent = ships;
+    }
+
+    const addShipPlacementListeners = (playerOne, playerTwo, callback) => {
+        let gridElement, grid;
+        if(playerOne.isTurn){
+            gridElement = this.playerOneElement.querySelector(".game-board");
+            grid = playerOne.gameboard;
+        } else {
+            gridElement = this.playerTwoElement.querySelector(".game-board");
+            grid = playerTwo.gameboard;
+        }
+        gridElement.addEventListener("dragover", event => event.preventDefault());
+        gridElement.addEventListener("dragenter", event => {
+            const shipSize = draggedShip.dataset["size"];
+            const horizontal = draggedShip.dataset["horizontal"] == "true";
+            const targetTile = event.target;
+            const row = parseInt(targetTile.dataset["row"]);
+            const column = parseInt(targetTile.dataset["column"]);
+            const coordArray = [];
+            for(let offset = 0; offset < shipSize; offset++){
+                if(horizontal){
+                    coordArray.push([row, column + offset]);
+                } else {
+                    coordArray.push([row + offset, column]);
+                }
+            }
+            if(coordArray.some(coordinates => !grid.validateCoordinates(...coordinates))){
+                targetTile.classList.add("invalid-ship-placement");
+            } else {
+                targetTile.classList.add("valid-ship-placement");
+            }
+        });
+        gridElement.addEventListener("dragleave", event => {
+            event.target.classList.remove("invalid-ship-placement");
+            event.target.classList.remove("valid-ship-placement");
+        });
+
+        gridElement.addEventListener("drop", event => {
+            if(event.target.classList.contains("valid-ship-placement")){
+                const row = parseInt(event.target.dataset["row"]);
+                const column = parseInt(event.target.dataset["column"]);
+                const shipSize = parseInt(draggedShip.dataset["size"]);
+                const horizontal = draggedShip.dataset["horizontal"] == "true";
+                callback(playerOne, playerTwo, row, column, shipSize, horizontal);
+            }
+        });
+
+        // gridElement.querySelectorAll(".tile.unknown").forEach(tile => {
+        //     tile.addEventListener("dragover", event => event.preventDefault());
+        //     tile.addEventListener("dragenter", event => {
+        //         event.target.style.backgroundColor = "#ffffff";
+        //     });
+        // })
     }
 
     const addAttackListeners = (playerOne, playerTwo, callback) => {
@@ -255,11 +315,12 @@ const DOMControls = (() => {
         showGameUI,
         showGameOver,
         readPlayerInput,
-        clearBoard,
+        clearContainer,
         setBoardGrid,
         renderBoard,
         renderBoards,
         renderDocks,
+        addShipPlacementListeners,
         addAttackListeners,
         displayWinner,
    };

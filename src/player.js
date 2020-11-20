@@ -5,7 +5,8 @@ class Player {
         this.isCPU = isCPU || false; // Defaults to false (human)
         this.playHistory = new Array();
         this.gameboard = null;
-        this.ready = false;
+        this.isReady = false;
+        this.unplacedShips = new Array();
 
         if(this.isCPU){
             //this.enemyShips = ShipArray.slice(0)
@@ -22,22 +23,41 @@ class Player {
         this.gameboard = board;
     }
 
-    randomizeShips(unplacedShips){
-        while(unplacedShips.length != 0){
+    getUnplacedShips(){
+        return this.unplacedShips.slice(0);
+    }
+
+    setShipArray(ships){
+        this.unplacedShips = ships;
+    }
+
+    addShips(ships){
+        console.log("Trying to add these ships: ", ships);
+        const newShipArray = this.getUnplacedShips().concat(ships)
+        console.log(newShipArray);
+        this.setShipArray(newShipArray);
+    }
+
+    randomizeShips(){
+        while(this.unplacedShips.length != 0){
             try {
                 let r = Math.floor(Math.random() * this.gameboard.height);
                 let c = Math.floor(Math.random() * this.gameboard.width);
                 let horizontal = Math.random() > 0.5;
-                this.gameboard.placeShip(r, c, unplacedShips[0], horizontal);
-                unplacedShips.shift();
+                this.gameboard.placeShip(r, c, this.unplacedShips[0], horizontal);
+                this.unplacedShips.shift();
             } catch (e) {
                 continue;
             }
         }
     }
 
+    clearBoard(){
+        this.addShips(this.gameboard.removeShips());
+    }
+
     setReady(ready){
-        this.ready = ready;
+        this.isReady = ready;
     }
 
     setTurn(isTurn){

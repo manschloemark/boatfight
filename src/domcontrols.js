@@ -143,14 +143,26 @@ const DOMControls = (() => {
         renderBoard(boardTwo, playerTwo);
     }
 
-    const renderDocks = (playerOne, playerTwo, ships) => {
-        let dock;
+    const renderDocks = (playerOne, playerTwo, randomizeCB, readyCB) => {
+        let dock, ships;
         if(playerOne.isTurn){
+            ships = playerOne.unplacedShips;
             dock = this.playerOneElement.querySelector(".ship-dock");
+            this.playerTwoElement.querySelector(".ship-dock").classList.add("idle");
         } else {
+            ships = playerTwo.unplacedShips;
             dock = this.playerTwoElement.querySelector(".ship-dock");
+            this.playerOneElement.querySelector(".ship-dock").classList.add("idle");
         }
-        dock.textContent = ships;
+        dock.classList.remove("hidden");
+        container = dock.querySelector(".ship-container");
+        dock.querySelector(".randomize-ships").addEventListener("click", (event) => {
+            randomizeCB(playerOne, playerTwo, ships);
+        })
+        dock.querySelector(".ready-up").addEventListener("click", (event) => {
+            readyCB(playerOne, playerTwo);
+        })
+        container.textContent = ships;
     }
 
     const addAttackListeners = (playerOne, playerTwo, callback) => {

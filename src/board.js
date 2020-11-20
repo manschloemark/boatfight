@@ -2,12 +2,16 @@ const ShipFactory = require("./ships");
 const GameBoardFactory = (rows, columns) => {
     const height = rows;
     const width = columns;
-    const grid = new Array(rows);
-    for(let rowNumber = 0; rowNumber < rows; rowNumber++){
-        grid[rowNumber] = new Array(columns).fill(null);
-    }
+    let ships;
+    let grid;
 
-    const ships = new Array();
+    const init = () => {
+        ships = new Array();
+        grid = new Array(height);
+        for(let rowNumber = 0; rowNumber < height; rowNumber++){
+            grid[rowNumber] = new Array(width).fill(null);
+        }
+    }
 
     // Given the parameters for placing a ship, generate an array of [row, column] values
     // that the ship will be placed on
@@ -69,6 +73,12 @@ const GameBoardFactory = (rows, columns) => {
         };
     };
 
+    const removeShips = () => {
+        removedShips = ships.slice(0).map(ship => ship.getLength());
+        init();
+        return removedShips;
+    }
+
     const viewBoard = () => {
         return grid.map(row => row.slice(0));
     }
@@ -96,7 +106,9 @@ const GameBoardFactory = (rows, columns) => {
         return ships.every(ship => ship.isSunk());
     }
 
-    return { width, height, viewBoard, placeShip, receiveAttack, allShipsSunk };
+    init();
+
+    return { width, height, viewBoard, placeShip, removeShips, receiveAttack, allShipsSunk };
 };
 
 

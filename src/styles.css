@@ -85,6 +85,10 @@ button {
     flex-direction: column;
 }
 
+.player-container {
+    margin-top: 0;
+}
+
 #player-flex-box{
     display: flex;
     flex-direction: row;
@@ -155,6 +159,26 @@ button {
 .tile.left-one {
     border-left: 1px dashed #242424;
 }
+
+.ship-dock {
+    height: 10%;
+    display: flex;
+}
+
+.ship-dock.idle *{
+    display: none;
+}
+
+.ship-container {
+    flex-grow: 1;
+}
+
+.ship-placement-controls {
+    display: flex;
+    flex-direction: column;
+}
+
+
 
 .hidden {
     display: none !important;

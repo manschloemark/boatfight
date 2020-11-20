@@ -64,6 +64,9 @@ function startNewGame(){
     playerOne.setGameboard(boardOne);
     playerTwo.setGameboard(boardTwo);
 
+    playerOne.setShipArray(ShipArray.slice(0));
+    playerTwo.setShipArray(ShipArray.slice(0));
+
     playerOne.setTurn((Math.random() > 0.5));
     playerTwo.setTurn(! playerOne.isTurn);
 
@@ -71,38 +74,37 @@ function startNewGame(){
     shipPlacementTurn(playerOne, playerTwo);
 }
 
-function randomShipPlacement(playerOne, playerTwo, ships){
+function randomShipPlacement(playerOne, playerTwo){
     let activePlayer;
     if(playerOne.isTurn){
         activePlayer = playerOne;
     } else {
         activePlayer = playerTwo;
     }
-    activePlayer.randomizeShips(ships);
+    console.log(activePlayer);
+    activePlayer.clearBoard();
+    console.log(activePlayer);
+    activePlayer.randomizeShips();
+    DOMControls.renderBoards(playerOne, playerTwo);
 }
 
 function shipPlacementTurn(playerOne, playerTwo){
-    DOMControls.renderBoards(playerOne, playerTwo);
-    let activePlayer;
-    if(playerOne.isTurn){
-        activePlayer = playerOne;
-    } else {
-        activePlayer = playerTwo;
-    }
-    if(activePlayer.ready){
-        // If this function is called and the player who's turn it is has already
-        // ready up'd, ship placement is now complete.
+    if(playerOne.isReady && playerTwo.isReady){
         setupTurn(playerOne, playerTwo);
     } else {
-        const ships = ShipArray.slice(0);
-        if(activePlayer.isCPU){
-            randomShipPlacement(playerOne, playerTwo, ships);
-            activePlayer.setReady(true);
-            finishShipPlacement(playerOne, playerTwo, ships);
+        let activePlayer;
+        if(playerOne.isTurn){
+            activePlayer = playerOne;
         } else {
-            randomShipPlacement(playerOne, playerTwo, ships);
+            activePlayer = playerTwo;
+        }
+        if(activePlayer.isCPU){
+            randomShipPlacement(playerOne, playerTwo);
+            finishShipPlacement(playerOne, playerTwo);
+        } else {
             // Human can manually or choose to randomize ships
-            //DOMControls.renderDocks(playerOne, playerTwo, playerOneShips, playerTwoShips);
+            DOMControls.renderBoards(playerOne, playerTwo);
+            DOMControls.renderDocks(playerOne, playerTwo, randomShipPlacement, finishShipPlacement);
             // In either case, the DOM should be updated to give the player a UI
             // so they can choose.
             // A callback will need to be passed somewhere that can handle either case.
@@ -110,15 +112,19 @@ function shipPlacementTurn(playerOne, playerTwo){
             // finishShipPlacement will be passed as the callback to "Ready" when a human
             // is placing ships, so they can randomize ship placements without automatically
             // accepting it.
-            activePlayer.setReady(true);
-            finishShipPlacement(playerOne, playerTwo, ships);
         }
-        
     }
 }
 
-function finishShipPlacement(playerOne, playerTwo, ships){
-    if(ships.length == 0){
+function finishShipPlacement(playerOne, playerTwo){
+    let activePlayer;
+    if(playerOne.isTurn){
+        activePlayer = playerOne;
+    } else {
+        activePlayer = playerTwo;
+    }
+    if(activePlayer.unplacedShips.length == 0){
+        activePlayer.setReady(true);
         toggleTurns(playerOne, playerTwo);
         shipPlacementTurn(playerOne, playerTwo);
     }
@@ -494,7 +500,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#who-attacks {\n    text-align: center;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.game-board.idle {\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid #242424;\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed #242424;\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed #242424;\n}\n\n.tile.right-one {\n    border-right: 1px dashed #242424;\n}\n\n.tile.left-one {\n    border-left: 1px dashed #242424;\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#who-attacks {\n    text-align: center;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.game-board.idle {\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid #242424;\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed #242424;\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed #242424;\n}\n\n.tile.right-one {\n    border-right: 1px dashed #242424;\n}\n\n.tile.left-one {\n    border-left: 1px dashed #242424;\n}\n\n.ship-dock {\n    height: 10%;\n    display: flex;\n}\n\n.ship-dock.idle *{\n    display: none;\n}\n\n.ship-container {\n    flex-grow: 1;\n}\n\n.ship-placement-controls {\n    display: flex;\n    flex-direction: column;\n}\n\n\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -607,12 +613,16 @@ const ShipFactory = __webpack_require__(5);
 const GameBoardFactory = (rows, columns) => {
     const height = rows;
     const width = columns;
-    const grid = new Array(rows);
-    for(let rowNumber = 0; rowNumber < rows; rowNumber++){
-        grid[rowNumber] = new Array(columns).fill(null);
-    }
+    let ships;
+    let grid;
 
-    const ships = new Array();
+    const init = () => {
+        ships = new Array();
+        grid = new Array(height);
+        for(let rowNumber = 0; rowNumber < height; rowNumber++){
+            grid[rowNumber] = new Array(width).fill(null);
+        }
+    }
 
     // Given the parameters for placing a ship, generate an array of [row, column] values
     // that the ship will be placed on
@@ -674,6 +684,12 @@ const GameBoardFactory = (rows, columns) => {
         };
     };
 
+    const removeShips = () => {
+        removedShips = ships.slice(0).map(ship => ship.getLength());
+        init();
+        return removedShips;
+    }
+
     const viewBoard = () => {
         return grid.map(row => row.slice(0));
     }
@@ -701,7 +717,9 @@ const GameBoardFactory = (rows, columns) => {
         return ships.every(ship => ship.isSunk());
     }
 
-    return { width, height, viewBoard, placeShip, receiveAttack, allShipsSunk };
+    init();
+
+    return { width, height, viewBoard, placeShip, removeShips, receiveAttack, allShipsSunk };
 };
 
 
@@ -750,7 +768,8 @@ class Player {
         this.isCPU = isCPU || false; // Defaults to false (human)
         this.playHistory = new Array();
         this.gameboard = null;
-        this.ready = false;
+        this.isReady = false;
+        this.unplacedShips = new Array();
 
         if(this.isCPU){
             //this.enemyShips = ShipArray.slice(0)
@@ -767,22 +786,41 @@ class Player {
         this.gameboard = board;
     }
 
-    randomizeShips(unplacedShips){
-        while(unplacedShips.length != 0){
+    getUnplacedShips(){
+        return this.unplacedShips.slice(0);
+    }
+
+    setShipArray(ships){
+        this.unplacedShips = ships;
+    }
+
+    addShips(ships){
+        console.log("Trying to add these ships: ", ships);
+        const newShipArray = this.getUnplacedShips().concat(ships)
+        console.log(newShipArray);
+        this.setShipArray(newShipArray);
+    }
+
+    randomizeShips(){
+        while(this.unplacedShips.length != 0){
             try {
                 let r = Math.floor(Math.random() * this.gameboard.height);
                 let c = Math.floor(Math.random() * this.gameboard.width);
                 let horizontal = Math.random() > 0.5;
-                this.gameboard.placeShip(r, c, unplacedShips[0], horizontal);
-                unplacedShips.shift();
+                this.gameboard.placeShip(r, c, this.unplacedShips[0], horizontal);
+                this.unplacedShips.shift();
             } catch (e) {
                 continue;
             }
         }
     }
 
+    clearBoard(){
+        this.addShips(this.gameboard.removeShips());
+    }
+
     setReady(ready){
-        this.ready = ready;
+        this.isReady = ready;
     }
 
     setTurn(isTurn){
@@ -1095,14 +1133,26 @@ const DOMControls = (() => {
         renderBoard(boardTwo, playerTwo);
     }
 
-    const renderDocks = (playerOne, playerTwo, ships) => {
-        let dock;
+    const renderDocks = (playerOne, playerTwo, randomizeCB, readyCB) => {
+        let dock, ships;
         if(playerOne.isTurn){
+            ships = playerOne.unplacedShips;
             dock = this.playerOneElement.querySelector(".ship-dock");
+            this.playerTwoElement.querySelector(".ship-dock").classList.add("idle");
         } else {
+            ships = playerTwo.unplacedShips;
             dock = this.playerTwoElement.querySelector(".ship-dock");
+            this.playerOneElement.querySelector(".ship-dock").classList.add("idle");
         }
-        dock.textContent = ships;
+        dock.classList.remove("hidden");
+        container = dock.querySelector(".ship-container");
+        dock.querySelector(".randomize-ships").addEventListener("click", (event) => {
+            randomizeCB(playerOne, playerTwo, ships);
+        })
+        dock.querySelector(".ready-up").addEventListener("click", (event) => {
+            readyCB(playerOne, playerTwo);
+        })
+        container.textContent = ships;
     }
 
     const addAttackListeners = (playerOne, playerTwo, callback) => {

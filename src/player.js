@@ -32,9 +32,7 @@ class Player {
     }
 
     addShips(ships){
-        console.log("Trying to add these ships: ", ships);
         const newShipArray = this.getUnplacedShips().concat(ships)
-        console.log(newShipArray);
         this.setShipArray(newShipArray);
     }
 

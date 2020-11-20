@@ -1,6 +1,7 @@
 :root {
     font-family: "Noto Sans", sans-serif;
 }
+
 html, body {
     margin: 0;
     padding: 0;
@@ -106,6 +107,10 @@ button {
     padding: 1em;
 }
 
+.player-container.is-turn {
+    background-color: red;
+}
+
 .game-board {
     background-color: #242424;
     display: grid;
@@ -113,8 +118,6 @@ button {
     place-content: center center;
 }
 
-.game-board.idle {
-}
 
 .tile {
     width: 64px;
@@ -171,6 +174,9 @@ button {
 
 .ship-container {
     flex-grow: 1;
+
+    display: flex;
+    flex-direction: row;
 }
 
 .ship-placement-controls {
@@ -178,7 +184,9 @@ button {
     flex-direction: column;
 }
 
-
+.placeable-ship {
+    background-color: #eaeaea;
+}
 
 .hidden {
     display: none !important;

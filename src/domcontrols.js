@@ -5,7 +5,8 @@ const DOMControls = (() => {
     this.gameOver = document.querySelector("#game-over");
     this.playerOneElement = document.querySelector("#player-one");
     this.playerTwoElement = document.querySelector("#player-two");
-
+    this.tileHeight = document.documentElement.clientHeight;
+    
     const showStartMenu = () => {
         this.startMenu.classList.remove("hidden");
         this.inGame.classList.add("hidden");
@@ -51,7 +52,7 @@ const DOMControls = (() => {
 
     const renderBoard = (boardElement, player) => {
         clearBoard(boardElement);
-
+        this.tileSize = document.documentElement.clientHeight / 10;
         if(player.isTurn){
             document.querySelector("#who-attacks").textContent = player.name + " is attacking";
             boardElement.classList.add("active");
@@ -137,13 +138,64 @@ const DOMControls = (() => {
     }
 
     const renderBoards = (playerOne, playerTwo) => {
+        if(playerOne.isTurn){
+            this.playerOneElement.classList.add("is-turn");
+            this.playerTwoElement.classList.remove("is-turn");
+        } else {
+            this.playerOneElement.classList.remove("is-turn");
+            this.playerTwoElement.classList.add("is-turn");
+        }
         const boardOne = this.playerOneElement.querySelector(".game-board");
         const boardTwo = this.playerTwoElement.querySelector(".game-board");
         renderBoard(boardOne, playerOne);
         renderBoard(boardTwo, playerTwo);
     }
 
-    const renderDocks = (playerOne, playerTwo, randomizeCB, readyCB) => {
+    const rotateShip = (event) => {
+        const ship = event.target;
+
+        const horizontal = ship.dataset["horizontal"] == "true";
+        ship.dataset["horizontal"] = ! horizontal;
+        if(ship.dataset["horizontal"] == "true"){
+            shortSide = "height";
+            longSide = "width";
+        } else {
+            shortSide = "width";
+            longSide = "height";
+        }
+        ship.style[shortSide] = "10em";
+        ship.style[longSide] = (10 * parseInt(ship.dataset["size"])) + "em";
+    }
+
+    const renderShips = (playerOne, playerTwo, container, callback) => {
+        let activePlayer;
+        if(playerOne.isTurn){
+            activePlayer = playerOne;
+        } else {
+            activePlayer = playerTwo;
+        }
+
+        // Draw ships in the dock
+        // Add callbacks to the ships
+        // I just realized how effed this is gonna be with my current grid implementation.
+        const ships = activePlayer.getUnplacedShips();
+        for(let i = 0; i < ships.length; i++){
+            let shipElement = document.createElement("div");
+            shipElement.dataset["size"] = ships[i];
+            shipElement.dataset["horizontal"] = false;
+            shipElement.classList.add("placeable-ship");
+            shipElement.style.height = 1 * ships[i] + 'em';
+            shipElement.style.width = '1em';
+            shipElement.addEventListener("click", event => {
+                rotateShip(event);
+            });
+            shipElement.addEventListener("drag", event  => {});
+            //shipElement.addEventListener("ondrag");
+            container.appendChild(shipElement);
+        }
+    }
+
+    const renderDocks = (playerOne, playerTwo, dragNDropCB, resetCB, randomizeCB, readyCB) => {
         let dock, ships;
         if(playerOne.isTurn){
             ships = playerOne.unplacedShips;
@@ -156,13 +208,20 @@ const DOMControls = (() => {
         }
         dock.classList.remove("hidden");
         container = dock.querySelector(".ship-container");
+
+        dock.querySelector(".reset-ships").addEventListener("click", (event) => {
+            resetCB(playerOne, playerTwo);
+        })
         dock.querySelector(".randomize-ships").addEventListener("click", (event) => {
             randomizeCB(playerOne, playerTwo, ships);
         })
         dock.querySelector(".ready-up").addEventListener("click", (event) => {
             readyCB(playerOne, playerTwo);
         })
-        container.textContent = ships;
+        // Instead of text content I'll have to make DOM elements for each ship in the array.
+        // These elements should be able to be dragged on the player's board and dropped in place.
+        renderShips(playerOne, playerTwo, container, dragNDropCB);
+        //container.textContent = ships;
     }
 
     const addAttackListeners = (playerOne, playerTwo, callback) => {

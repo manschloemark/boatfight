@@ -108,7 +108,16 @@ const GameBoardFactory = (rows, columns) => {
 
     init();
 
-    return { width, height, viewBoard, placeShip, removeShips, receiveAttack, allShipsSunk };
+    return {
+        width, 
+        height,
+        viewBoard,
+        validateCoordinates,
+        placeShip,
+        removeShips,
+        receiveAttack,
+        allShipsSunk,
+    };
 };
 
 

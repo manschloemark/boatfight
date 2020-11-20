@@ -50,6 +50,7 @@ function startNewGame(){
 
     const boardOne = GameBoardFactory(10, 10);
     const boardTwo = GameBoardFactory(10, 10);
+    console.log(boardOne, boardTwo);
     // Maybe make the board size an option?
     DOMControls.setBoardGrid(10, 10);
 
@@ -66,6 +67,21 @@ function startNewGame(){
     shipPlacementTurn(playerOne, playerTwo);
 }
 
+function manualShipPlacement(playerOne, playerTwo, shipSize, event) {
+    return;
+}
+
+function resetShips(playerOne, playerTwo){
+    let activePlayer;
+    if(playerOne.isTurn){
+        activePlayer = playerOne;
+    } else {
+        activePlayer = playerTwo;
+    }
+    activePlayer.clearBoard();
+    DOMControls.renderBoards(playerOne, playerTwo);
+}
+
 function randomShipPlacement(playerOne, playerTwo){
     let activePlayer;
     if(playerOne.isTurn){
@@ -73,9 +89,7 @@ function randomShipPlacement(playerOne, playerTwo){
     } else {
         activePlayer = playerTwo;
     }
-    console.log(activePlayer);
-    activePlayer.clearBoard();
-    console.log(activePlayer);
+    resetShips(playerOne, playerTwo);
     activePlayer.randomizeShips();
     DOMControls.renderBoards(playerOne, playerTwo);
 }
@@ -96,7 +110,7 @@ function shipPlacementTurn(playerOne, playerTwo){
         } else {
             // Human can manually or choose to randomize ships
             DOMControls.renderBoards(playerOne, playerTwo);
-            DOMControls.renderDocks(playerOne, playerTwo, randomShipPlacement, finishShipPlacement);
+            DOMControls.renderDocks(playerOne, playerTwo, manualShipPlacement, resetShips, randomShipPlacement, finishShipPlacement);
             // In either case, the DOM should be updated to give the player a UI
             // so they can choose.
             // A callback will need to be passed somewhere that can handle either case.

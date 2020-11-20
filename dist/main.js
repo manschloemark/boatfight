@@ -58,6 +58,7 @@ function startNewGame(){
 
     const boardOne = GameBoardFactory(10, 10);
     const boardTwo = GameBoardFactory(10, 10);
+    console.log(boardOne, boardTwo);
     // Maybe make the board size an option?
     DOMControls.setBoardGrid(10, 10);
 
@@ -74,6 +75,21 @@ function startNewGame(){
     shipPlacementTurn(playerOne, playerTwo);
 }
 
+function manualShipPlacement(playerOne, playerTwo, shipSize, event) {
+    return;
+}
+
+function resetShips(playerOne, playerTwo){
+    let activePlayer;
+    if(playerOne.isTurn){
+        activePlayer = playerOne;
+    } else {
+        activePlayer = playerTwo;
+    }
+    activePlayer.clearBoard();
+    DOMControls.renderBoards(playerOne, playerTwo);
+}
+
 function randomShipPlacement(playerOne, playerTwo){
     let activePlayer;
     if(playerOne.isTurn){
@@ -81,9 +97,7 @@ function randomShipPlacement(playerOne, playerTwo){
     } else {
         activePlayer = playerTwo;
     }
-    console.log(activePlayer);
-    activePlayer.clearBoard();
-    console.log(activePlayer);
+    resetShips(playerOne, playerTwo);
     activePlayer.randomizeShips();
     DOMControls.renderBoards(playerOne, playerTwo);
 }
@@ -104,7 +118,7 @@ function shipPlacementTurn(playerOne, playerTwo){
         } else {
             // Human can manually or choose to randomize ships
             DOMControls.renderBoards(playerOne, playerTwo);
-            DOMControls.renderDocks(playerOne, playerTwo, randomShipPlacement, finishShipPlacement);
+            DOMControls.renderDocks(playerOne, playerTwo, manualShipPlacement, resetShips, randomShipPlacement, finishShipPlacement);
             // In either case, the DOM should be updated to give the player a UI
             // so they can choose.
             // A callback will need to be passed somewhere that can handle either case.
@@ -500,7 +514,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#who-attacks {\n    text-align: center;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.game-board.idle {\n}\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid #242424;\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed #242424;\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed #242424;\n}\n\n.tile.right-one {\n    border-right: 1px dashed #242424;\n}\n\n.tile.left-one {\n    border-left: 1px dashed #242424;\n}\n\n.ship-dock {\n    height: 10%;\n    display: flex;\n}\n\n.ship-dock.idle *{\n    display: none;\n}\n\n.ship-container {\n    flex-grow: 1;\n}\n\n.ship-placement-controls {\n    display: flex;\n    flex-direction: column;\n}\n\n\n\n.hidden {\n    display: none !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.5);\n    border: 2px solid rgba(200, 200, 200, 0.5);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    display: flex;\n    justify-content: space-around;\n}\n\n#new-game {\n    margin: auto;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#who-attacks {\n    text-align: center;\n}\n\n.player-container {\n    padding: 1em;\n}\n\n.player-container.is-turn {\n    background-color: red;\n}\n\n.game-board {\n    background-color: #242424;\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n\n.tile {\n    width: 64px;\n    height: 64px;\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid #242424;\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: #eaeaea;\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed #242424;\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed #242424;\n}\n\n.tile.right-one {\n    border-right: 1px dashed #242424;\n}\n\n.tile.left-one {\n    border-left: 1px dashed #242424;\n}\n\n.ship-dock {\n    height: 10%;\n    display: flex;\n}\n\n.ship-dock.idle *{\n    display: none;\n}\n\n.ship-container {\n    flex-grow: 1;\n\n    display: flex;\n    flex-direction: row;\n}\n\n.ship-placement-controls {\n    display: flex;\n    flex-direction: column;\n}\n\n.placeable-ship {\n    background-color: #eaeaea;\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -719,7 +733,16 @@ const GameBoardFactory = (rows, columns) => {
 
     init();
 
-    return { width, height, viewBoard, placeShip, removeShips, receiveAttack, allShipsSunk };
+    return {
+        width, 
+        height,
+        viewBoard,
+        validateCoordinates,
+        placeShip,
+        removeShips,
+        receiveAttack,
+        allShipsSunk,
+    };
 };
 
 
@@ -795,9 +818,7 @@ class Player {
     }
 
     addShips(ships){
-        console.log("Trying to add these ships: ", ships);
         const newShipArray = this.getUnplacedShips().concat(ships)
-        console.log(newShipArray);
         this.setShipArray(newShipArray);
     }
 
@@ -995,7 +1016,8 @@ const DOMControls = (() => {
     this.gameOver = document.querySelector("#game-over");
     this.playerOneElement = document.querySelector("#player-one");
     this.playerTwoElement = document.querySelector("#player-two");
-
+    this.tileHeight = document.documentElement.clientHeight;
+    
     const showStartMenu = () => {
         this.startMenu.classList.remove("hidden");
         this.inGame.classList.add("hidden");
@@ -1041,7 +1063,7 @@ const DOMControls = (() => {
 
     const renderBoard = (boardElement, player) => {
         clearBoard(boardElement);
-
+        this.tileSize = document.documentElement.clientHeight / 10;
         if(player.isTurn){
             document.querySelector("#who-attacks").textContent = player.name + " is attacking";
             boardElement.classList.add("active");
@@ -1127,13 +1149,64 @@ const DOMControls = (() => {
     }
 
     const renderBoards = (playerOne, playerTwo) => {
+        if(playerOne.isTurn){
+            this.playerOneElement.classList.add("is-turn");
+            this.playerTwoElement.classList.remove("is-turn");
+        } else {
+            this.playerOneElement.classList.remove("is-turn");
+            this.playerTwoElement.classList.add("is-turn");
+        }
         const boardOne = this.playerOneElement.querySelector(".game-board");
         const boardTwo = this.playerTwoElement.querySelector(".game-board");
         renderBoard(boardOne, playerOne);
         renderBoard(boardTwo, playerTwo);
     }
 
-    const renderDocks = (playerOne, playerTwo, randomizeCB, readyCB) => {
+    const rotateShip = (event) => {
+        const ship = event.target;
+
+        const horizontal = ship.dataset["horizontal"] == "true";
+        ship.dataset["horizontal"] = ! horizontal;
+        if(ship.dataset["horizontal"] == "true"){
+            shortSide = "height";
+            longSide = "width";
+        } else {
+            shortSide = "width";
+            longSide = "height";
+        }
+        ship.style[shortSide] = "10em";
+        ship.style[longSide] = (10 * parseInt(ship.dataset["size"])) + "em";
+    }
+
+    const renderShips = (playerOne, playerTwo, container, callback) => {
+        let activePlayer;
+        if(playerOne.isTurn){
+            activePlayer = playerOne;
+        } else {
+            activePlayer = playerTwo;
+        }
+
+        // Draw ships in the dock
+        // Add callbacks to the ships
+        // I just realized how effed this is gonna be with my current grid implementation.
+        const ships = activePlayer.getUnplacedShips();
+        for(let i = 0; i < ships.length; i++){
+            let shipElement = document.createElement("div");
+            shipElement.dataset["size"] = ships[i];
+            shipElement.dataset["horizontal"] = false;
+            shipElement.classList.add("placeable-ship");
+            shipElement.style.height = 1 * ships[i] + 'em';
+            shipElement.style.width = '1em';
+            shipElement.addEventListener("click", event => {
+                rotateShip(event);
+            });
+            shipElement.addEventListener("drag", event  => {});
+            //shipElement.addEventListener("ondrag");
+            container.appendChild(shipElement);
+        }
+    }
+
+    const renderDocks = (playerOne, playerTwo, dragNDropCB, resetCB, randomizeCB, readyCB) => {
         let dock, ships;
         if(playerOne.isTurn){
             ships = playerOne.unplacedShips;
@@ -1146,13 +1219,20 @@ const DOMControls = (() => {
         }
         dock.classList.remove("hidden");
         container = dock.querySelector(".ship-container");
+
+        dock.querySelector(".reset-ships").addEventListener("click", (event) => {
+            resetCB(playerOne, playerTwo);
+        })
         dock.querySelector(".randomize-ships").addEventListener("click", (event) => {
             randomizeCB(playerOne, playerTwo, ships);
         })
         dock.querySelector(".ready-up").addEventListener("click", (event) => {
             readyCB(playerOne, playerTwo);
         })
-        container.textContent = ships;
+        // Instead of text content I'll have to make DOM elements for each ship in the array.
+        // These elements should be able to be dragged on the player's board and dropped in place.
+        renderShips(playerOne, playerTwo, container, dragNDropCB);
+        //container.textContent = ships;
     }
 
     const addAttackListeners = (playerOne, playerTwo, callback) => {

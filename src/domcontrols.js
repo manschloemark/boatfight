@@ -43,18 +43,24 @@ const DOMControls = (() => {
         }
     }
 
-    const setBoardGrid = (numRows, numColumns) => {
-        document.querySelectorAll(".game-board").forEach(board => {
-            board.style.gridTemplateRows = `repeat(${numRows}, 1fr)`;
-            board.style.gridTemplateColumns = `repeat(${numColumns}, 1fr)`;
-        })
+    const setBoardGrid = (boardElement, playerBoard) => {
+        boardElement.style.gridTemplateRows = `repeat(${playerBoard.height}, 1fr)`;
+        boardElement.style.gridTemplateColumns = `repeat(${playerBoard.width}, 1fr)`;
     }
 
+    // Using version above instead
+    // const setBoardGrid = (numRows, numColumns) => {
+    //     document.querySelectorAll(".game-board").forEach(board => {
+    //         board.style.gridTemplateRows = `repeat(${numRows}, 1fr)`;
+    //         board.style.gridTemplateColumns = `repeat(${numColumns}, 1fr)`;
+    //     })
+    // }
+
     const renderBoard = (boardElement, player) => {
-        clearContainer(boardElement);
+        //clearContainer(boardElement);
+        setBoardGrid(boardElement, player.gameboard);
         this.tileSize = document.documentElement.clientHeight / 18;
         if(player.isTurn){
-            document.querySelector("#who-attacks").textContent = player.name + " is attacking";
             boardElement.classList.add("active");
             boardElement.classList.remove("idle");
         } else {
@@ -147,8 +153,23 @@ const DOMControls = (() => {
             this.playerOneElement.classList.remove("is-turn");
             this.playerTwoElement.classList.add("is-turn");
         }
-        const boardOne = this.playerOneElement.querySelector(".game-board");
-        const boardTwo = this.playerTwoElement.querySelector(".game-board");
+        // I have to remove and create new game boards because I was stacking drag and drop
+        // event listeners on the same boards multiple times.
+        // This is not a pleasant way to do this, but I'm not really concerned right now.
+        let boardOne = this.playerOneElement.querySelector(".game-board");
+        let boardTwo = this.playerTwoElement.querySelector(".game-board");
+        this.playerOneElement.removeChild(boardOne);
+        this.playerTwoElement.removeChild(boardTwo);
+
+        boardOne = document.createElement('div');
+        boardTwo = document.createElement('div');
+        
+        boardOne.classList.add("game-board");
+        boardTwo.classList.add("game-board");
+
+        this.playerOneElement.insertBefore(boardOne, this.playerOneElement.querySelector(".ship-dock"));
+        this.playerTwoElement.insertBefore(boardTwo, this.playerTwoElement.querySelector(".ship-dock"));
+
         renderBoard(boardOne, playerOne);
         renderBoard(boardTwo, playerTwo);
     }
@@ -169,7 +190,7 @@ const DOMControls = (() => {
         ship.style[longSide] = (this.tileSize * parseInt(ship.dataset["size"])) + "px";
     }
 
-    const renderShips = (playerOne, playerTwo, container, callback) => {
+    const renderShips = (playerOne, playerTwo, container) => {
         let activePlayer;
         if(playerOne.isTurn){
             activePlayer = playerOne;
@@ -201,7 +222,7 @@ const DOMControls = (() => {
         }
     }
 
-    const renderDocks = (playerOne, playerTwo, dragNDropCB, resetCB, randomizeCB, readyCB) => {
+    const renderDocks = (playerOne, playerTwo, resetCB, randomizeCB, readyCB) => {
         let dock, ships;
         if(playerOne.isTurn){
             ships = playerOne.unplacedShips;
@@ -214,21 +235,42 @@ const DOMControls = (() => {
             dock = this.playerTwoElement.querySelector(".ship-dock");
             this.playerOneElement.querySelector(".ship-dock").classList.add("idle");
         }
-        dock.classList.remove("hidden");
+        dock.classList.remove("idle");
         container = dock.querySelector(".ship-container");
-        clearContainer(container);
-        dock.querySelector(".reset-ships").addEventListener("click", (event) => {
+        // I realized that I kept adding callbacks to these buttons, so now I create new buttons
+        // every time
+        buttonContainer = dock.querySelector(".ship-placement-controls");
+        clearContainer(buttonContainer);
+        const resetButton = document.createElement("button");
+        resetButton.textContent = "Reset"
+        resetButton.classList.add("reset-ships");
+        resetButton.type = "button"
+        const randomizeButton = document.createElement("button");
+        randomizeButton.textContent = "Randomize";
+        randomizeButton.classList.add("randomize-ships");
+        randomizeButton.type = "button"
+        const readyButton = document.createElement("button");
+        readyButton.textContent = "Ready";
+        readyButton.classList.add("ready-up");
+        readyButton.type = "button"
+
+        resetButton.addEventListener("click", (event) => {
             resetCB(playerOne, playerTwo);
         })
-        dock.querySelector(".randomize-ships").addEventListener("click", (event) => {
+        randomizeButton.addEventListener("click", (event) => {
             randomizeCB(playerOne, playerTwo, ships);
         })
-        dock.querySelector(".ready-up").addEventListener("click", (event) => {
+        readyButton.addEventListener("click", (event) => {
             readyCB(playerOne, playerTwo);
         })
-        // Instead of text content I'll have to make DOM elements for each ship in the array.
-        // These elements should be able to be dragged on the player's board and dropped in place.
-        renderShips(playerOne, playerTwo, container, dragNDropCB);
+
+        buttonContainer.appendChild(resetButton);
+        buttonContainer.appendChild(randomizeButton);
+        buttonContainer.appendChild(readyButton);
+
+
+        clearContainer(container);
+        renderShips(playerOne, playerTwo, container);
     }
 
     const addShipPlacementListeners = (playerOne, playerTwo, callback) => {
@@ -242,6 +284,9 @@ const DOMControls = (() => {
         }
         gridElement.addEventListener("dragover", event => event.preventDefault());
         gridElement.addEventListener("dragenter", event => {
+            if(!event.target.classList.contains("tile")){
+                return;
+            }
             const shipSize = draggedShip.dataset["size"];
             const horizontal = draggedShip.dataset["horizontal"] == "true";
             const targetTile = event.target;
@@ -303,6 +348,10 @@ const DOMControls = (() => {
         }
     }
 
+    const displayInstructions = (instructions) => {
+        document.querySelector("#instructions").textContent = instructions;
+    }
+
     const displayWinner = (winner, loser) => {
         this.gameOver.querySelector("#winner").textContent = winner.name + " wins!";
         this.gameOver.querySelector("#loser").textContent = "Sorry, " + loser.name + "...";
@@ -322,6 +371,7 @@ const DOMControls = (() => {
         renderDocks,
         addShipPlacementListeners,
         addAttackListeners,
+        displayInstructions,
         displayWinner,
    };
 })();

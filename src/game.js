@@ -21,7 +21,6 @@ function executeTurn(playerOne, playerTwo, event){
         attacker = playerTwo;
         board = playerOne.gameboard;
     }
-    console.log(attacker.name + " is attacking...");
     let attackHit;
     if(attacker.isCPU){
         attackHit = attacker.cpuAttack(board);
@@ -50,9 +49,10 @@ function startNewGame(){
 
     const boardOne = GameBoardFactory(10, 10);
     const boardTwo = GameBoardFactory(10, 10);
-    console.log(boardOne, boardTwo);
+
     // Maybe make the board size an option?
-    DOMControls.setBoardGrid(10, 10);
+    // Instead of setting this at the start I set it each time the board is rendered.
+    //DOMControls.setBoardGrid(10, 10);
 
     playerOne.setGameboard(boardOne);
     playerTwo.setGameboard(boardTwo);
@@ -62,6 +62,13 @@ function startNewGame(){
 
     playerOne.setTurn((Math.random() > 0.5));
     playerTwo.setTurn(! playerOne.isTurn);
+
+    if(playerOne.isCPU){
+        playerOne.enemyShipsRemaining = ShipArray.slice(0);
+    }
+    if(playerTwo.isCPU){
+        playerTwo.enemyShipsRemaining = ShipArray.slice(0);
+    }
 
     DOMControls.showGameUI();
     shipPlacementTurn(playerOne, playerTwo);
@@ -75,7 +82,18 @@ function resetShips(playerOne, playerTwo){
         activePlayer = playerTwo;
     }
     activePlayer.clearBoard();
-    DOMControls.renderBoards(playerOne, playerTwo);
+    shipPlacementTurn(playerOne, playerTwo);
+}
+
+function cpuShipPlacement(playerOne, playerTwo){
+    let activePlayer;
+    if(playerOne.isTurn){
+        activePlayer = playerOne;
+    } else {
+        activePlayer = playerTwo;
+    }
+    activePlayer.randomizeShips();
+    finishShipPlacement(playerOne, playerTwo);
 }
 
 function manualShipPlacement(playerOne, playerTwo, row, column, shipSize, horizontal) {
@@ -92,8 +110,7 @@ function manualShipPlacement(playerOne, playerTwo, row, column, shipSize, horizo
             throw e;
         }
     }
-    DOMControls.renderBoards(playerOne, playerTwo);
-    DOMControls.renderDocks(playerOne, playerTwo, manualShipPlacement, resetShips, randomShipPlacement, finishShipPlacement);
+    shipPlacementTurn(playerOne, playerTwo);
 }
 
 function randomShipPlacement(playerOne, playerTwo){
@@ -103,9 +120,8 @@ function randomShipPlacement(playerOne, playerTwo){
     } else {
         activePlayer = playerTwo;
     }
-    resetShips(playerOne, playerTwo);
     activePlayer.randomizeShips();
-    DOMControls.renderBoards(playerOne, playerTwo);
+    shipPlacementTurn(playerOne, playerTwo);
 }
 
 function shipPlacementTurn(playerOne, playerTwo){
@@ -119,13 +135,11 @@ function shipPlacementTurn(playerOne, playerTwo){
             activePlayer = playerTwo;
         }
         if(activePlayer.isCPU){
-            randomShipPlacement(playerOne, playerTwo);
-            finishShipPlacement(playerOne, playerTwo);
+            cpuShipPlacement(playerOne, playerTwo);
         } else {
             // Human can manually or choose to randomize ships
-            DOMControls.renderBoards(playerOne, playerTwo);
-            DOMControls.renderDocks(playerOne, playerTwo, manualShipPlacement, resetShips, randomShipPlacement, finishShipPlacement);
-            DOMControls.addShipPlacementListeners(playerOne, playerTwo, manualShipPlacement);
+            DOMControls.displayInstructions(`${activePlayer.name} is placing ships...`);
+            setupShipPlacementUI(playerOne, playerTwo);    
             // In either case, the DOM should be updated to give the player a UI
             // so they can choose.
             // A callback will need to be passed somewhere that can handle either case.
@@ -134,6 +148,14 @@ function shipPlacementTurn(playerOne, playerTwo){
             // is placing ships, so they can randomize ship placements without automatically
             // accepting it.
         }
+    }
+}
+
+function setupShipPlacementUI(playerOne, playerTwo){
+    DOMControls.renderBoards(playerOne, playerTwo);
+    DOMControls.renderDocks(playerOne, playerTwo, resetShips, randomShipPlacement, finishShipPlacement);
+    if(!((playerOne.isTurn && playerOne.getUnplacedShips().length == 0) || (playerTwo.isTurn && playerTwo.getUnplacedShips().length == 0))){
+        DOMControls.addShipPlacementListeners(playerOne, playerTwo, manualShipPlacement);
     }
 }
 
@@ -173,6 +195,13 @@ function setupTurn(playerOne, playerTwo){
             // }
             executeTurn(playerOne, playerTwo);
         } else {
+            let name;
+            if(playerOne.isTurn){
+                name = playerOne.name;
+            } else {
+                name = playerTwo.name;
+            }
+            DOMControls.displayInstructions(`${name} is attacking`);
             DOMControls.renderBoards(playerOne, playerTwo);
             DOMControls.addAttackListeners(playerOne, playerTwo, executeTurn);
         }

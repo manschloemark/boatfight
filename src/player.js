@@ -15,7 +15,7 @@ class Player {
                 horizontal: null,
                 backtracked: false,
             }
-            this.enemyShipsRemaining = [5, 4, 3, 3, 2]; // Ugly to hard-code this
+            this.enemyShipsRemaining = null; // Ugly to hard-code this
         }
     }
 
@@ -40,7 +40,7 @@ class Player {
         try{
             let shipIndex = this.unplacedShips.indexOf(shipSize);
             if(shipIndex == -1){
-                let shipError = new Error("Player does not have ship of size " + shipSize);
+                let shipError = new Error(this.name + " does not have ship of size " + shipSize);
                 shipError.name = "ShipError";
                 throw shipError;
             }
@@ -65,7 +65,8 @@ class Player {
     }
 
     clearBoard(){
-        this.addShips(this.gameboard.removeShips());
+        const recoveredShips = this.gameboard.removeShips();
+        this.addShips(recoveredShips);
     }
 
     setReady(ready){
@@ -101,8 +102,8 @@ class Player {
         let row, column;
         let attackHit = null;
         if(this.lastHit.coords != null){
-            if(this.enemyShipsRemaining[0] == this.lastHit.coords.length){
-                this.enemyShipsRemaining.shift();
+            if(this.enemyShipsRemaining.slice(-1) == this.lastHit.coords.length){
+                this.enemyShipsRemaining.pop();
             } else {
                 [row, column] = this.lastHit.coords[0].split(' ');
                 row = parseInt(row);

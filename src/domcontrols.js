@@ -300,24 +300,46 @@ const DOMControls = (() => {
                     coordArray.push([row + offset, column]);
                 }
             }
+            let classString;
             if(coordArray.some(coordinates => !grid.validateCoordinates(...coordinates))){
-                targetTile.classList.add("invalid-ship-placement");
+                classString = "invalid-ship-placement";
             } else {
-                targetTile.classList.add("valid-ship-placement");
+                classString = "valid-ship-placement";
+            }
+            let r, c;
+            let tileElement;
+            for(let i = 0; i < coordArray.length; i++){
+                [r, c] = coordArray[i];
+                tileElement = gridElement.querySelector(`[data-row="${r}"][data-column="${c}"]`)
+                if(tileElement){
+                    tileElement.classList.add(classString);
+                }
             }
         });
-        gridElement.addEventListener("dragleave", event => {
-            event.target.classList.remove("invalid-ship-placement");
-            event.target.classList.remove("valid-ship-placement");
+        gridElement.addEventListener("dragexit", event => {
+            gridElement.querySelectorAll(".invalid-ship-placement").forEach(tile => {
+                tile.classList.remove("invalid-ship-placement");
+            });
+            gridElement.querySelectorAll(".valid-ship-placement").forEach(tile => {
+                tile.classList.remove("valid-ship-placement");
+            });
         });
 
         gridElement.addEventListener("drop", event => {
+            event.preventDefault();
+            // Note: I don't need to remove classes assigned from drag event handlers
+            // ("(in)valid-ship-placement") when the ship is dropped on a valid tile
+            // because that grid will be deleted and recreated anyway.
             if(event.target.classList.contains("valid-ship-placement")){
                 const row = parseInt(event.target.dataset["row"]);
                 const column = parseInt(event.target.dataset["column"]);
                 const shipSize = parseInt(draggedShip.dataset["size"]);
                 const horizontal = draggedShip.dataset["horizontal"] == "true";
                 callback(playerOne, playerTwo, row, column, shipSize, horizontal);
+            } else {
+                gridElement.querySelectorAll(".invalid-ship-placement").forEach(tile => {
+                    tile.classList.remove("invalid-ship-placement");
+                })
             }
         });
 

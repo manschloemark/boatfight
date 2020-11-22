@@ -52,8 +52,49 @@ button {
 }
 
 #player-creation {
+    margin: 0;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
+}
+
+.player-entry {
+    display: grid;
+    grid-template-areas: "player-number player-number"
+                         "name-label name-entry"
+                         "cpu-label cpu-checkbox";
+
+    gap: 1em;
+}
+
+.player-number {
+    grid-area: player-number;
+}
+
+.name-label {
+    grid-area: name-label;
+
+    text-align: right;
+}
+
+.player-name {
+    grid-area: name-entry;
+
+    background-color: #eaeaea;
+    color: #242424;
+    font-size: 0.9em;
+    border-radius: 8px;
+}
+
+.is-cpu-label {
+    grid-area: cpu-label;
+
+    text-align: right;
+}
+
+.is-cpu {
+    grid-area: cpu-checkbox;
+    width: min-content;
+    background-color: #eaeaea;
 }
 
 #new-game {

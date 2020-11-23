@@ -15,7 +15,7 @@ const DOMControls = __webpack_require__(8);
 
 const ShipArray = [2, 3, 3, 4, 5];
 
-function toggleTurns(playerOne, playerTwo, callback){
+function toggleTurns(playerOne, playerTwo, callback, delayTransition){
     if(playerOne.isCPU || playerTwo.isCPU){
         // If either player is a CPU, don't bother with the control switch screen
         // because CPU turns are immediate and the human won't see anything secret
@@ -29,10 +29,15 @@ function toggleTurns(playerOne, playerTwo, callback){
         playerOne.toggleTurn();
         playerTwo.setTurn(! playerOne.isTurn);
         // I use a 1/4 second timeout so the user can see the boards for a little bit
-        // before they fade out
-        setTimeout( () => {
-        DOMControls.switchSides(playerOne, playerTwo, callback);
-        }, 250);
+        // after attacking.
+        // The delay does not happen after a player clicks 'Ready' when placing their ships
+        if(delayTransition){
+            setTimeout( () => {
+            DOMControls.switchSides(playerOne, playerTwo, callback);
+            }, 150);
+        } else {
+            DOMControls.switchSides(playerOne, playerTwo, callback);
+        }
     }
 }
 
@@ -56,7 +61,7 @@ function executeTurn(playerOne, playerTwo, event){
     
 
     if(!attackHit){
-        toggleTurns(playerOne, playerTwo, setupTurn);
+        toggleTurns(playerOne, playerTwo, setupTurn, true);
     } else {
         setupTurn(playerOne, playerTwo);
     }
@@ -194,7 +199,7 @@ function finishShipPlacement(playerOne, playerTwo){
     }
     if(activePlayer.unplacedShips.length == 0){
         activePlayer.setReady(true);
-        toggleTurns(playerOne, playerTwo, shipPlacementTurn);
+        toggleTurns(playerOne, playerTwo, shipPlacementTurn, false);
         //shipPlacementTurn(playerOne, playerTwo);
         return true;
     }

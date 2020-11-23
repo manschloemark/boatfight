@@ -7,9 +7,16 @@ const DOMControls = require("./domcontrols");
 
 const ShipArray = [2, 3, 3, 4, 5];
 
-function toggleTurns(playerOne, playerTwo){
+function toggleTurns(playerOne, playerTwo, callback){
     playerOne.toggleTurn();
     playerTwo.setTurn(! playerOne.isTurn);
+    if(playerOne.isCPU || playerTwo.isCPU){
+        // If either player is a CPU, don't bother with the control switch screen
+        // because CPU turns are immediate and the human won't see anything secret
+        callback(playerOne, playerTwo);
+    } else {
+        DOMControls.switchSides(playerOne, playerTwo, callback);
+    }
 }
 
 function executeTurn(playerOne, playerTwo, event){
@@ -32,9 +39,10 @@ function executeTurn(playerOne, playerTwo, event){
     
 
     if(!attackHit){
-        toggleTurns(playerOne, playerTwo);
+        toggleTurns(playerOne, playerTwo, setupTurn);
+    } else {
+        setupTurn(playerOne, playerTwo);
     }
-    setupTurn(playerOne, playerTwo);
 
 }
 
@@ -69,7 +77,7 @@ function startNewGame(){
     if(playerTwo.isCPU){
         playerTwo.enemyShipsRemaining = ShipArray.slice(0);
     }
-
+    DOMControls.renderPlayerNames(playerOne, playerTwo);
     DOMControls.showGameUI();
     shipPlacementTurn(playerOne, playerTwo);
 }
@@ -126,6 +134,7 @@ function randomShipPlacement(playerOne, playerTwo){
 
 function shipPlacementTurn(playerOne, playerTwo){
     if(playerOne.isReady && playerTwo.isReady){
+        DOMControls.clearDockButtons();
         setupTurn(playerOne, playerTwo);
     } else {
         let activePlayer;
@@ -168,9 +177,15 @@ function finishShipPlacement(playerOne, playerTwo){
     }
     if(activePlayer.unplacedShips.length == 0){
         activePlayer.setReady(true);
-        toggleTurns(playerOne, playerTwo);
-        shipPlacementTurn(playerOne, playerTwo);
+        toggleTurns(playerOne, playerTwo, shipPlacementTurn);
+        //shipPlacementTurn(playerOne, playerTwo);
+        return true;
     }
+    return false;
+}
+
+function startBattlePhase(playerOne, playerTwo){
+
 }
 
 function setupTurn(playerOne, playerTwo){

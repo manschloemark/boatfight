@@ -1,5 +1,6 @@
 const DOMControls = (() => {
 
+    this.turnSwitch = document.querySelector("#turn-switch");
     this.startMenu = document.querySelector("#start-menu");
     this.inGame = document.querySelector("#in-game");
     this.gameOver = document.querySelector("#game-over");
@@ -11,12 +12,35 @@ const DOMControls = (() => {
         this.startMenu.classList.remove("hidden");
         this.inGame.classList.add("hidden");
         this.gameOver.classList.add("hidden");
+        this.turnSwitch.classList.add("hidden");
     }
 
     const showGameUI = () => {
         this.inGame.classList.remove("hidden");
         this.startMenu.classList.add("hidden");
         this.gameOver.classList.add("hidden");
+        this.turnSwitch.classList.add("hidden");
+    }
+
+    const showTurnSwitch = () => {
+        this.turnSwitch.classList.remove("hidden");
+        const heightOffset = document.querySelector("header").clientHeight;
+        console.log(heightOffset);
+        const width = document.documentElement.clientWidth;
+        let height = document.documentElement.clientHeight;
+        height = height - heightOffset;
+        //this.turnSwitch.style.position = "static";
+        this.turnSwitch.style.top = heightOffset;
+        this.turnSwitch.style.left = 0;
+        this.turnSwitch.style.width = width + "px";
+        this.turnSwitch.style.height = height + "px";
+        // this.inGame.classList.add("hidden");
+        // this.startMenu.classList.add("hidden");
+        // this.gameOver.classList.add("hidden");
+    }
+
+    const hideTurnSwitch = () => {
+        this.turnSwitch.classList.add("hidden");
     }
 
     const showGameOver = () => {
@@ -35,6 +59,40 @@ const DOMControls = (() => {
             playerData.push([isCPU, name]);
         });
         return playerData;
+    }
+
+    const switchSides = (playerOne, playerTwo, callback) => {
+        let activeName, inactiveName;
+        if(playerOne.isTurn){
+            activeName = playerOne.name;
+            inactiveName = playerTwo.name;
+        } else {
+            activeName = playerTwo.name;
+            inactiveName = playerOne.name;
+        }
+        clearContainer(this.turnSwitch);
+        const instructionP = document.createElement("p");
+        instructionP.textContent = `Handing control to ${activeName}.`;
+        const cheekyP = document.createElement("p");
+        cheekyP.textContent = `No peeking, ${inactiveName}!`
+
+        const button = document.createElement("button");
+        button.textContent = "Ready";
+        button.addEventListener("click", event => {
+            hideTurnSwitch();
+            callback(playerOne, playerTwo);
+        });
+
+        this.turnSwitch.appendChild(instructionP);
+        this.turnSwitch.appendChild(cheekyP);
+        this.turnSwitch.appendChild(button);
+
+        showTurnSwitch();
+    }
+
+    const renderPlayerNames = (playerOne, playerTwo) => {
+        this.playerOneElement.querySelector(".name").textContent = playerOne.name;
+        this.playerTwoElement.querySelector(".name").textContent = playerTwo.name;
     }
 
     const clearContainer = (container) => {
@@ -149,9 +207,15 @@ const DOMControls = (() => {
         if(playerOne.isTurn){
             this.playerOneElement.classList.add("is-turn");
             this.playerTwoElement.classList.remove("is-turn");
+
+            this.playerOneElement.classList.remove("idle");
+            this.playerTwoElement.classList.add("idle");
         } else {
             this.playerOneElement.classList.remove("is-turn");
             this.playerTwoElement.classList.add("is-turn");
+
+            this.playerOneElement.classList.add("idle");
+            this.playerTwoElement.classList.remove("idle");
         }
         // I have to remove and create new game boards because I was stacking drag and drop
         // event listeners on the same boards multiple times.
@@ -222,24 +286,30 @@ const DOMControls = (() => {
         }
     }
 
+    const clearDockButtons = () => {
+        document.querySelectorAll(".ship-placement-controls").forEach(container => {
+            clearContainer(container);
+        });
+    }
+
     const renderDocks = (playerOne, playerTwo, resetCB, randomizeCB, readyCB) => {
         let dock, ships;
         if(playerOne.isTurn){
             ships = playerOne.unplacedShips;
             grid = this.playerOneElement.querySelector(".game-board");
             dock = this.playerOneElement.querySelector(".ship-dock");
-            this.playerTwoElement.querySelector(".ship-dock").classList.add("idle");
+            this.playerTwoElement.querySelector(".ship-dock").classList.add("inactive");
         } else {
             ships = playerTwo.unplacedShips;
             grid = this.playerTwoElement.querySelector(".game-board");
             dock = this.playerTwoElement.querySelector(".ship-dock");
-            this.playerOneElement.querySelector(".ship-dock").classList.add("idle");
+            this.playerOneElement.querySelector(".ship-dock").classList.add("inactive");
         }
-        dock.classList.remove("idle");
-        container = dock.querySelector(".ship-container");
+        dock.classList.remove("inactive");
+        let container = dock.querySelector(".ship-container");
         // I realized that I kept adding callbacks to these buttons, so now I create new buttons
         // every time
-        buttonContainer = dock.querySelector(".ship-placement-controls");
+        let buttonContainer = dock.querySelector(".ship-placement-controls");
         clearContainer(buttonContainer);
         const resetButton = document.createElement("button");
         resetButton.textContent = "Reset"
@@ -261,7 +331,8 @@ const DOMControls = (() => {
             randomizeCB(playerOne, playerTwo, ships);
         })
         readyButton.addEventListener("click", (event) => {
-            readyCB(playerOne, playerTwo);
+            if(readyCB(playerOne, playerTwo)){
+            }
         })
 
         buttonContainer.appendChild(resetButton);
@@ -384,13 +455,18 @@ const DOMControls = (() => {
     return {
         showStartMenu,
         showGameUI,
+        showTurnSwitch,
+        hideTurnSwitch,
         showGameOver,
+        switchSides,
         readPlayerInput,
         clearContainer,
         setBoardGrid,
+        renderPlayerNames,
         renderBoard,
         renderBoards,
         renderDocks,
+        clearDockButtons,
         addShipPlacementListeners,
         addAttackListeners,
         displayInstructions,

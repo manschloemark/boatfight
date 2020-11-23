@@ -1,5 +1,12 @@
 :root {
     font-family: "Noto Sans", sans-serif;
+    font-size: 16pt;
+
+    --bgcolor: #242424;
+    --lightbgcolor: #484848;
+    --bgcontrast: #eaeaea;
+    --active-board-background: #006020;
+    --inactive-board-background: #a00000;
 }
 
 html, body {
@@ -21,6 +28,11 @@ body {
 
 header {
     padding: 0 10%;
+}
+
+#header-title {
+    font-size: 1.4em;
+    font-weight: bold;
 }
 
 main {
@@ -64,6 +76,9 @@ button {
                          "cpu-label cpu-checkbox";
 
     gap: 1em;
+    border-radius: 8px;
+    background-color: #484848;
+    padding: 0 1em 1em 1em;
 }
 
 .player-number {
@@ -73,7 +88,7 @@ button {
 .name-label {
     grid-area: name-label;
 
-    text-align: right;
+    text-align: left;
 }
 
 .player-name {
@@ -88,7 +103,7 @@ button {
 .is-cpu-label {
     grid-area: cpu-label;
 
-    text-align: right;
+    text-align: left;
 }
 
 .is-cpu {
@@ -98,7 +113,10 @@ button {
 }
 
 #new-game {
-    margin: auto;
+    width: 10%;
+    min-width: min-content;
+    margin: 1em auto;
+    font-size: 1.2em;
 }
 
 #game-over {
@@ -123,6 +141,8 @@ button {
 }
 
 
+/* Battle styles - game boards, ships, docks */
+
 #in-game {
     display: flex;
     flex-direction: column;
@@ -146,20 +166,30 @@ button {
 }
 
 .player-container {
-    padding: 1em;
+    padding: 0 1em 1em 1em;
+}
+
+.name {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 0 auto auto auto;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
 
 .player-container.is-turn {
-    background-color: red;
+    box-shadow: 0 0 12px 8px green;
+}
+
+.player-container.idle {
+    box-shadow: 0 0 12px 8px red;
 }
 
 .game-board {
-    background-color: #242424;
     display: grid;
     /* gap: 2px; */
     place-content: center center;
 }
-
 
 .tile {
     /* width: 64px;
@@ -168,7 +198,7 @@ button {
     text-align: center;
     font-size: 18pt;
     font-family: monospace;
-    border: 1px solid #242424;
+    border: 1px solid var(--bgcolor);
 }
 
 .game-board .tile.unknown:hover {
@@ -176,7 +206,7 @@ button {
 }
 
 .tile.empty {
-    background-color: #eaeaea;
+    background-color: var(--bgcontrast);
 }
 
 .tile.ship {
@@ -190,19 +220,19 @@ button {
 }
 
 .tile.up-one {
-    border-top: 1px dashed #242424;
+    border-top: 1px dashed var(--bgcolor);
 }
 
 .tile.down-one {
-    border-bottom: 1px dashed #242424;
+    border-bottom: 1px dashed var(--bgcolor);
 }
 
 .tile.right-one {
-    border-right: 1px dashed #242424;
+    border-right: 1px dashed var(--bgcolor);
 }
 
 .tile.left-one {
-    border-left: 1px dashed #242424;
+    border-left: 1px dashed var(--bgcolor);
 }
 
 .tile.valid-ship-placement {
@@ -218,7 +248,7 @@ button {
     display: flex;
 }
 
-.ship-dock.idle *{
+.ship-dock.inactive *{
     display: none;
 }
 
@@ -240,6 +270,14 @@ button {
 
 .placeable-ship {
     background-color: #696969;
+}
+
+#turn-switch {
+    background-color: var(--bgcolor);
+    text-align: center;
+    padding-top: 20%;
+    position: sticky;
+    z-index: 999;
 }
 
 .hidden {

@@ -6,12 +6,13 @@
     </head>
     <body>
         <header>
-            <h1>Boat Fight!</h1>
+            <p id="header-title">Boat Fight!</p>
         </header>
         <main>
+            <div id="turn-switch">
+            </div>
             <div id="start-menu">
-                <h2>Boat Fight!</h2>
-                <p>Two players battle with ships!</p>
+                <p>Who's playing?</p>
                 <div id="player-creation">
                     <div class="player-entry">
                         <h3 class="player-number">Player One</h3>
@@ -28,7 +29,7 @@
                         <input type="checkbox" id="p2-is-cpu" class="is-cpu" checked>
                     </div>
                 </div>
-                <button type="button" id="new-game">New Game</button>
+                <button type="button" id="new-game">Fight!</button>
             </div>
             <div id="game-over" class="hidden">
                 <h2 id="winner"></h2>
@@ -41,8 +42,10 @@
                 </div>
             </div>
             <div id="in-game" class="hidden">
+                <p id="instructions"></p>
                 <div id="player-flex-box">
                     <div class="player-container" id="player-one">
+                        <p class="name"></p>
                         <div class="game-board">
                         
                         </div>
@@ -54,6 +57,7 @@
                         </div>
                     </div>
                     <div class="player-container" id="player-two">
+                        <p class="name"></p>
                         <div class="game-board">
                         </div>
                         <div class="ship-dock">
@@ -64,7 +68,6 @@
                         </div>
                     </div>
                 </div>
-                <h2 id="instructions"></h2>
             </div>
         </main>
     </body>

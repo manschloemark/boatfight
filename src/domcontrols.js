@@ -8,24 +8,24 @@ const DOMControls = (() => {
     this.playerTwoElement = document.querySelector("#player-two");
     //this.tileHeight = document.documentElement.clientHeight / 20;
 
+    this.betweenTurns = false;
+
     const showStartMenu = () => {
         this.startMenu.classList.remove("hidden");
         this.inGame.classList.add("hidden");
         this.gameOver.classList.add("hidden");
-        this.turnSwitch.classList.add("hidden");
+        //this.turnSwitch.classList.add("hidden");
     }
 
     const showGameUI = () => {
         this.inGame.classList.remove("hidden");
         this.startMenu.classList.add("hidden");
         this.gameOver.classList.add("hidden");
-        this.turnSwitch.classList.add("hidden");
+        //this.turnSwitch.classList.add("hidden");
     }
 
     const showTurnSwitch = () => {
-        this.turnSwitch.classList.remove("hidden");
         const heightOffset = document.querySelector("header").clientHeight;
-        console.log(heightOffset);
         const width = document.documentElement.clientWidth;
         let height = document.documentElement.clientHeight;
         height = height - heightOffset;
@@ -37,10 +37,12 @@ const DOMControls = (() => {
         // this.inGame.classList.add("hidden");
         // this.startMenu.classList.add("hidden");
         // this.gameOver.classList.add("hidden");
+        this.turnSwitch.classList.add("show");
     }
 
     const hideTurnSwitch = () => {
-        this.turnSwitch.classList.add("hidden");
+        this.turnSwitch.classList.remove("show");
+        //this.turnSwitch.classList.add("hidden");
     }
 
     const showGameOver = () => {
@@ -62,6 +64,8 @@ const DOMControls = (() => {
     }
 
     const switchSides = (playerOne, playerTwo, callback) => {
+        this.betweenTurns = true;
+        this.turnSwitch.classList.remove("hidden");
         let activeName, inactiveName;
         if(playerOne.isTurn){
             activeName = playerOne.name;
@@ -79,6 +83,7 @@ const DOMControls = (() => {
         const button = document.createElement("button");
         button.textContent = "Ready";
         button.addEventListener("click", event => {
+            this.betweenTurns = false;
             hideTurnSwitch();
             callback(playerOne, playerTwo);
         });
@@ -451,6 +456,27 @@ const DOMControls = (() => {
         this.gameOver.querySelector("#winner-stats").textContent = `${winner.name} fired ${winner.playHistory.length} shots`;
         this.gameOver.querySelector("#loser-stats").textContent = `${loser.name} fired ${loser.playHistory.length} shots`;
     }
+
+    // Make the turn switch element automatically hide and unhide after the transitions
+    // this.turnSwitch.addEventListener("transitionstart", event => {
+    //     if(event.propertyName != "opacity"){
+    //         return;
+    //     }
+    //     if(this.betweenTurns){
+    //         event.target.classList.remove("hidden");
+    //     }
+    // });
+
+    this.turnSwitch.addEventListener("transitionend", event => {
+        if(event.propertyName != "opacity"){
+            return;
+        }
+        // If this.betweenTurns is false that means the turnSwitch went from 100 opacity to 0,
+        // and should be hidden so it is not read by screen readers and does not block user input
+        if( ! this.betweenTurns){
+            event.target.classList.add("hidden");
+        }
+    })
 
     return {
         showStartMenu,

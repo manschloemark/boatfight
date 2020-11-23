@@ -8,14 +8,23 @@ const DOMControls = require("./domcontrols");
 const ShipArray = [2, 3, 3, 4, 5];
 
 function toggleTurns(playerOne, playerTwo, callback){
-    playerOne.toggleTurn();
-    playerTwo.setTurn(! playerOne.isTurn);
     if(playerOne.isCPU || playerTwo.isCPU){
         // If either player is a CPU, don't bother with the control switch screen
         // because CPU turns are immediate and the human won't see anything secret
+        playerOne.toggleTurn();
+        playerTwo.setTurn(! playerOne.isTurn);
         callback(playerOne, playerTwo);
     } else {
+        //Wait a half a second so players can see the result of their attacks.
+        // Render the board first so the attacker can see the result of their attack
+        DOMControls.renderBoards(playerOne, playerTwo);
+        playerOne.toggleTurn();
+        playerTwo.setTurn(! playerOne.isTurn);
+        // I use a 1/4 second timeout so the user can see the boards for a little bit
+        // before they fade out
+        setTimeout( () => {
         DOMControls.switchSides(playerOne, playerTwo, callback);
+        }, 250);
     }
 }
 

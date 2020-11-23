@@ -16,14 +16,23 @@ const DOMControls = __webpack_require__(8);
 const ShipArray = [2, 3, 3, 4, 5];
 
 function toggleTurns(playerOne, playerTwo, callback){
-    playerOne.toggleTurn();
-    playerTwo.setTurn(! playerOne.isTurn);
     if(playerOne.isCPU || playerTwo.isCPU){
         // If either player is a CPU, don't bother with the control switch screen
         // because CPU turns are immediate and the human won't see anything secret
+        playerOne.toggleTurn();
+        playerTwo.setTurn(! playerOne.isTurn);
         callback(playerOne, playerTwo);
     } else {
+        //Wait a half a second so players can see the result of their attacks.
+        // Render the board first so the attacker can see the result of their attack
+        DOMControls.renderBoards(playerOne, playerTwo);
+        playerOne.toggleTurn();
+        playerTwo.setTurn(! playerOne.isTurn);
+        // I use a 1/4 second timeout so the user can see the boards for a little bit
+        // before they fade out
+        setTimeout( () => {
         DOMControls.switchSides(playerOne, playerTwo, callback);
+        }, 250);
     }
 }
 
@@ -573,7 +582,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n    font-size: 16pt;\n\n    --bgcolor: #242424;\n    --lightbgcolor: #484848;\n    --bgcontrast: #eaeaea;\n    --active-board-background: #006020;\n    --inactive-board-background: #a00000;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\n#header-title {\n    font-size: 1.4em;\n    font-weight: bold;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.8);\n    color: black;\n    border: 2px solid rgba(200, 200, 200, 0.9);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    margin: 0;\n    display: flex;\n    justify-content: space-evenly;\n}\n\n.player-entry {\n    display: grid;\n    grid-template-areas: \"player-number player-number\"\n                         \"name-label name-entry\"\n                         \"cpu-label cpu-checkbox\";\n\n    gap: 1em;\n    border-radius: 8px;\n    background-color: #484848;\n    padding: 0 1em 1em 1em;\n}\n\n.player-number {\n    grid-area: player-number;\n}\n\n.name-label {\n    grid-area: name-label;\n\n    text-align: left;\n}\n\n.player-name {\n    grid-area: name-entry;\n\n    background-color: #eaeaea;\n    color: #242424;\n    font-size: 0.9em;\n    border-radius: 8px;\n}\n\n.is-cpu-label {\n    grid-area: cpu-label;\n\n    text-align: left;\n}\n\n.is-cpu {\n    grid-area: cpu-checkbox;\n    width: min-content;\n    background-color: #eaeaea;\n}\n\n#new-game {\n    width: 10%;\n    min-width: min-content;\n    margin: 1em auto;\n    font-size: 1.2em;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n/* Battle styles - game boards, ships, docks */\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#instructions{\n    text-align: center;\n}\n\n.player-container {\n    padding: 0 1em 1em 1em;\n}\n\n.name {\n    text-align: center;\n    font-size: 1.2em;\n    margin: 0 auto auto auto;\n    border-top-left-radius: 12px;\n    border-top-right-radius: 12px;\n}\n\n.player-container.is-turn {\n    box-shadow: 0 0 12px 8px green;\n}\n\n.player-container.idle {\n    box-shadow: 0 0 12px 8px red;\n}\n\n.game-board {\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.tile {\n    /* width: 64px;\n    height: 64px; */\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid var(--bgcolor);\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: var(--bgcontrast);\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed var(--bgcolor);\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed var(--bgcolor);\n}\n\n.tile.right-one {\n    border-right: 1px dashed var(--bgcolor);\n}\n\n.tile.left-one {\n    border-left: 1px dashed var(--bgcolor);\n}\n\n.tile.valid-ship-placement {\n    background-color: #24aa24;\n}\n\n.tile.invalid-ship-placement {\n    background-color: #aa2424;\n}\n\n.ship-dock {\n    height: 10%;\n    display: flex;\n}\n\n.ship-dock.inactive *{\n    display: none;\n}\n\n.ship-container {\n    flex-grow: 1;\n\n    display: flex;\n    flex-direction: row;\n    justify-content: space-between;\n    flex-wrap: wrap;\n}\n\n.ship-placement-controls {\n    margin: 0 auto;\n    display: flex;\n    flex-direction: column;\n    justify-content: space-around;\n}\n\n.placeable-ship {\n    background-color: #696969;\n}\n\n#turn-switch {\n    background-color: var(--bgcolor);\n    text-align: center;\n    padding-top: 20%;\n    position: sticky;\n    z-index: 999;\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n    font-size: 16pt;\n\n    --bgcolor: #242424;\n    --lightbgcolor: #484848;\n    --bgcontrast: #eaeaea;\n    --active-board-background: #006020;\n    --inactive-board-background: #a00000;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\n#header-title {\n    font-size: 1.4em;\n    font-weight: bold;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.8);\n    color: black;\n    border: 2px solid rgba(200, 200, 200, 0.9);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    margin: 0;\n    display: flex;\n    justify-content: space-evenly;\n}\n\n.player-entry {\n    display: grid;\n    grid-template-areas: \"player-number player-number\"\n                         \"name-label name-entry\"\n                         \"cpu-label cpu-checkbox\";\n\n    gap: 1em;\n    border-radius: 8px;\n    background-color: #484848;\n    padding: 0 1em 1em 1em;\n}\n\n.player-number {\n    grid-area: player-number;\n}\n\n.name-label {\n    grid-area: name-label;\n\n    text-align: left;\n}\n\n.player-name {\n    grid-area: name-entry;\n\n    background-color: #eaeaea;\n    color: #242424;\n    font-size: 0.9em;\n    border-radius: 8px;\n}\n\n.is-cpu-label {\n    grid-area: cpu-label;\n\n    text-align: left;\n}\n\n.is-cpu {\n    grid-area: cpu-checkbox;\n    width: min-content;\n    background-color: #eaeaea;\n}\n\n#new-game {\n    width: 10%;\n    min-width: min-content;\n    margin: 1em auto;\n    font-size: 1.2em;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n/* Battle styles - game boards, ships, docks */\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#instructions{\n    text-align: center;\n}\n\n.player-container {\n    padding: 0 1em 1em 1em;\n}\n\n.name {\n    text-align: center;\n    font-size: 1.2em;\n    margin: 0 auto auto auto;\n    border-top-left-radius: 12px;\n    border-top-right-radius: 12px;\n}\n\n.player-container.is-turn {\n    box-shadow: 0 0 12px 8px green;\n}\n\n.player-container.idle {\n    box-shadow: 0 0 12px 8px red;\n}\n\n.game-board {\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.tile {\n    /* width: 64px;\n    height: 64px; */\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid var(--bgcolor);\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: var(--bgcontrast);\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed var(--bgcolor);\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed var(--bgcolor);\n}\n\n.tile.right-one {\n    border-right: 1px dashed var(--bgcolor);\n}\n\n.tile.left-one {\n    border-left: 1px dashed var(--bgcolor);\n}\n\n.tile.valid-ship-placement {\n    background-color: #24aa24;\n}\n\n.tile.invalid-ship-placement {\n    background-color: #aa2424;\n}\n\n.ship-dock {\n    height: 10%;\n    display: flex;\n}\n\n.ship-dock.inactive *{\n    display: none;\n}\n\n.ship-container {\n    flex-grow: 1;\n\n    display: flex;\n    flex-direction: row;\n    justify-content: space-between;\n    flex-wrap: wrap;\n}\n\n.ship-placement-controls {\n    margin: 0 auto;\n    display: flex;\n    flex-direction: column;\n    justify-content: space-around;\n}\n\n.placeable-ship {\n    background-color: #696969;\n}\n\n#turn-switch {\n    position: absolute;\n    opacity: 0;\n    transition: opacity 0.75s;\n    background-color: var(--bgcolor);\n    text-align: center;\n    padding-top: 10%;\n    z-index: 999;\n}\n\n#turn-switch.show {\n    opacity: 100;\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1093,24 +1102,24 @@ const DOMControls = (() => {
     this.playerTwoElement = document.querySelector("#player-two");
     //this.tileHeight = document.documentElement.clientHeight / 20;
 
+    this.betweenTurns = false;
+
     const showStartMenu = () => {
         this.startMenu.classList.remove("hidden");
         this.inGame.classList.add("hidden");
         this.gameOver.classList.add("hidden");
-        this.turnSwitch.classList.add("hidden");
+        //this.turnSwitch.classList.add("hidden");
     }
 
     const showGameUI = () => {
         this.inGame.classList.remove("hidden");
         this.startMenu.classList.add("hidden");
         this.gameOver.classList.add("hidden");
-        this.turnSwitch.classList.add("hidden");
+        //this.turnSwitch.classList.add("hidden");
     }
 
     const showTurnSwitch = () => {
-        this.turnSwitch.classList.remove("hidden");
         const heightOffset = document.querySelector("header").clientHeight;
-        console.log(heightOffset);
         const width = document.documentElement.clientWidth;
         let height = document.documentElement.clientHeight;
         height = height - heightOffset;
@@ -1122,10 +1131,12 @@ const DOMControls = (() => {
         // this.inGame.classList.add("hidden");
         // this.startMenu.classList.add("hidden");
         // this.gameOver.classList.add("hidden");
+        this.turnSwitch.classList.add("show");
     }
 
     const hideTurnSwitch = () => {
-        this.turnSwitch.classList.add("hidden");
+        this.turnSwitch.classList.remove("show");
+        //this.turnSwitch.classList.add("hidden");
     }
 
     const showGameOver = () => {
@@ -1147,6 +1158,8 @@ const DOMControls = (() => {
     }
 
     const switchSides = (playerOne, playerTwo, callback) => {
+        this.betweenTurns = true;
+        this.turnSwitch.classList.remove("hidden");
         let activeName, inactiveName;
         if(playerOne.isTurn){
             activeName = playerOne.name;
@@ -1164,6 +1177,7 @@ const DOMControls = (() => {
         const button = document.createElement("button");
         button.textContent = "Ready";
         button.addEventListener("click", event => {
+            this.betweenTurns = false;
             hideTurnSwitch();
             callback(playerOne, playerTwo);
         });
@@ -1536,6 +1550,27 @@ const DOMControls = (() => {
         this.gameOver.querySelector("#winner-stats").textContent = `${winner.name} fired ${winner.playHistory.length} shots`;
         this.gameOver.querySelector("#loser-stats").textContent = `${loser.name} fired ${loser.playHistory.length} shots`;
     }
+
+    // Make the turn switch element automatically hide and unhide after the transitions
+    // this.turnSwitch.addEventListener("transitionstart", event => {
+    //     if(event.propertyName != "opacity"){
+    //         return;
+    //     }
+    //     if(this.betweenTurns){
+    //         event.target.classList.remove("hidden");
+    //     }
+    // });
+
+    this.turnSwitch.addEventListener("transitionend", event => {
+        if(event.propertyName != "opacity"){
+            return;
+        }
+        // If this.betweenTurns is false that means the turnSwitch went from 100 opacity to 0,
+        // and should be hidden so it is not read by screen readers and does not block user input
+        if( ! this.betweenTurns){
+            event.target.classList.add("hidden");
+        }
+    })
 
     return {
         showStartMenu,

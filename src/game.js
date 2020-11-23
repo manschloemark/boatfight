@@ -209,15 +209,15 @@ function setupTurn(playerOne, playerTwo){
             // a half a second to attack.
             // In a human vs CPU battle, I assume the player doesn't care to
             // watch the CPU attack, and the board is not rendered for CPU turns.
-            // if(playerOne.isCPU && playerTwo.isCPU){
-            //     DOMControls.renderBoards(playerOne, playerTwo);
-            //     setTimeout(() => {
-            //         executeTurn(playerOne, playerTwo)
-            //     }, 500);
-            // } else {
-            //     executeTurn(playerOne, playerTwo);
-            // }
-            executeTurn(playerOne, playerTwo);
+            if(playerOne.isCPU && playerTwo.isCPU){
+                DOMControls.renderBoards(playerOne, playerTwo);
+                setTimeout(() => {
+                    executeTurn(playerOne, playerTwo)
+                }, 150);
+            } else {
+                executeTurn(playerOne, playerTwo);
+            }
+            //executeTurn(playerOne, playerTwo);
         } else {
             let name;
             if(playerOne.isTurn){

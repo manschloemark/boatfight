@@ -30,9 +30,9 @@ const DOMControls = (() => {
         let height = document.documentElement.clientHeight;
         height = height - heightOffset;
         //this.turnSwitch.style.position = "static";
-        this.turnSwitch.style.top = heightOffset;
+        this.turnSwitch.style.top = heightOffset + "px";
         this.turnSwitch.style.left = 0;
-        this.turnSwitch.style.width = width + "px";
+        //this.turnSwitch.style.width = width + "px";
         this.turnSwitch.style.height = height + "px";
         // this.inGame.classList.add("hidden");
         // this.startMenu.classList.add("hidden");

@@ -149,6 +149,7 @@ function randomShipPlacement(playerOne, playerTwo){
 function shipPlacementTurn(playerOne, playerTwo){
     if(playerOne.isReady && playerTwo.isReady){
         DOMControls.clearDockButtons();
+        DOMControls.showPlayerElements();
         setupTurn(playerOne, playerTwo);
     } else {
         let activePlayer;
@@ -199,7 +200,6 @@ function finishShipPlacement(playerOne, playerTwo){
 }
 
 function startBattlePhase(playerOne, playerTwo){
-
 }
 
 function setupTurn(playerOne, playerTwo){

@@ -6,6 +6,7 @@ const DOMControls = (() => {
     this.gameOver = document.querySelector("#game-over");
     this.playerOneElement = document.querySelector("#player-one");
     this.playerTwoElement = document.querySelector("#player-two");
+    this.dockElement = document.querySelector("#ship-dock");
     //this.tileHeight = document.documentElement.clientHeight / 20;
 
     this.betweenTurns = false;
@@ -98,6 +99,11 @@ const DOMControls = (() => {
     const renderPlayerNames = (playerOne, playerTwo) => {
         this.playerOneElement.querySelector(".name").textContent = playerOne.name;
         this.playerTwoElement.querySelector(".name").textContent = playerTwo.name;
+    }
+
+    const showPlayerElements = () => {
+        this.playerOneElement.classList.remove("hidden");
+        this.playerTwoElement.classList.remove("hidden");
     }
 
     const clearContainer = (container) => {
@@ -236,8 +242,8 @@ const DOMControls = (() => {
         boardOne.classList.add("game-board");
         boardTwo.classList.add("game-board");
 
-        this.playerOneElement.insertBefore(boardOne, this.playerOneElement.querySelector(".ship-dock"));
-        this.playerTwoElement.insertBefore(boardTwo, this.playerTwoElement.querySelector(".ship-dock"));
+        this.playerOneElement.appendChild(boardOne);
+        this.playerTwoElement.appendChild(boardTwo);
 
         renderBoard(boardOne, playerOne);
         renderBoard(boardTwo, playerTwo);
@@ -292,29 +298,27 @@ const DOMControls = (() => {
     }
 
     const clearDockButtons = () => {
-        document.querySelectorAll(".ship-placement-controls").forEach(container => {
-            clearContainer(container);
-        });
+        clearContainer(document.querySelector("#ship-placement-controls"));
     }
 
     const renderDocks = (playerOne, playerTwo, resetCB, randomizeCB, readyCB) => {
-        let dock, ships;
+        let ships;
         if(playerOne.isTurn){
             ships = playerOne.unplacedShips;
             grid = this.playerOneElement.querySelector(".game-board");
-            dock = this.playerOneElement.querySelector(".ship-dock");
-            this.playerTwoElement.querySelector(".ship-dock").classList.add("inactive");
+            this.playerOneElement.classList.remove("hidden");
+            this.playerTwoElement.classList.add("hidden");
         } else {
             ships = playerTwo.unplacedShips;
             grid = this.playerTwoElement.querySelector(".game-board");
-            dock = this.playerTwoElement.querySelector(".ship-dock");
-            this.playerOneElement.querySelector(".ship-dock").classList.add("inactive");
+            this.playerTwoElement.classList.remove("hidden");
+            this.playerOneElement.classList.add("hidden");
         }
-        dock.classList.remove("inactive");
-        let container = dock.querySelector(".ship-container");
+        this.dockElement.classList.remove("hidden");
+        let container = this.dockElement.querySelector("#ship-container");
         // I realized that I kept adding callbacks to these buttons, so now I create new buttons
         // every time
-        let buttonContainer = dock.querySelector(".ship-placement-controls");
+        let buttonContainer = this.dockElement.querySelector("#ship-placement-controls");
         clearContainer(buttonContainer);
         const resetButton = document.createElement("button");
         resetButton.textContent = "Reset"
@@ -485,6 +489,7 @@ const DOMControls = (() => {
         hideTurnSwitch,
         showGameOver,
         switchSides,
+        showPlayerElements,
         readPlayerInput,
         clearContainer,
         setBoardGrid,

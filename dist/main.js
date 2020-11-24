@@ -157,6 +157,7 @@ function randomShipPlacement(playerOne, playerTwo){
 function shipPlacementTurn(playerOne, playerTwo){
     if(playerOne.isReady && playerTwo.isReady){
         DOMControls.clearDockButtons();
+        DOMControls.showPlayerElements();
         setupTurn(playerOne, playerTwo);
     } else {
         let activePlayer;
@@ -207,7 +208,6 @@ function finishShipPlacement(playerOne, playerTwo){
 }
 
 function startBattlePhase(playerOne, playerTwo){
-
 }
 
 function setupTurn(playerOne, playerTwo){
@@ -587,7 +587,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n    font-size: 16pt;\n\n    --bgcolor: #242424;\n    --lightbgcolor: #484848;\n    --bgcontrast: #eaeaea;\n    --active-board-background: #006020;\n    --inactive-board-background: #a00000;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\n#header-title {\n    font-size: 1.4em;\n    font-weight: bold;\n    margin: 0;\n    padding: 1em 0;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.8);\n    color: black;\n    border: 2px solid rgba(200, 200, 200, 0.9);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    margin: 0;\n    display: flex;\n    justify-content: space-evenly;\n}\n\n.player-entry {\n    display: grid;\n    grid-template-areas: \"player-number player-number\"\n                         \"name-label name-entry\"\n                         \"cpu-label cpu-checkbox\";\n\n    gap: 1em;\n    border-radius: 8px;\n    background-color: #484848;\n    padding: 0 1em 1em 1em;\n}\n\n.player-number {\n    grid-area: player-number;\n}\n\n.name-label {\n    grid-area: name-label;\n\n    text-align: left;\n}\n\n.player-name {\n    grid-area: name-entry;\n\n    background-color: #eaeaea;\n    color: #242424;\n    font-size: 0.9em;\n    border-radius: 8px;\n}\n\n.is-cpu-label {\n    grid-area: cpu-label;\n\n    text-align: left;\n}\n\n.is-cpu {\n    grid-area: cpu-checkbox;\n    width: min-content;\n    background-color: #eaeaea;\n}\n\n#new-game {\n    width: 10%;\n    min-width: min-content;\n    margin: 1em auto;\n    font-size: 1.2em;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n/* Battle styles - game boards, ships, docks */\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#instructions{\n    text-align: center;\n}\n\n.player-container {\n    padding: 0 1em 1em 1em;\n}\n\n.name {\n    text-align: center;\n    font-size: 1.2em;\n    margin: 0 auto auto auto;\n    border-top-left-radius: 12px;\n    border-top-right-radius: 12px;\n}\n\n.player-container.is-turn {\n    box-shadow: 0 0 12px 8px green;\n}\n\n.player-container.idle {\n    box-shadow: 0 0 12px 8px red;\n}\n\n.game-board {\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.tile {\n    /* width: 64px;\n    height: 64px; */\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid var(--bgcolor);\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: var(--bgcontrast);\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed var(--bgcolor);\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed var(--bgcolor);\n}\n\n.tile.right-one {\n    border-right: 1px dashed var(--bgcolor);\n}\n\n.tile.left-one {\n    border-left: 1px dashed var(--bgcolor);\n}\n\n.tile.valid-ship-placement {\n    background-color: #24aa24;\n}\n\n.tile.invalid-ship-placement {\n    background-color: #aa2424;\n}\n\n.ship-dock {\n    height: 10%;\n    display: flex;\n}\n\n.ship-dock.inactive *{\n    display: none;\n}\n\n.ship-container {\n    flex-grow: 1;\n\n    display: flex;\n    flex-direction: row;\n    justify-content: space-between;\n    flex-wrap: wrap;\n}\n\n.ship-placement-controls {\n    margin: 0 auto;\n    display: flex;\n    flex-direction: column;\n    justify-content: space-around;\n}\n\n.placeable-ship {\n    background-color: #696969;\n}\n\n#turn-switch {\n    position: absolute;\n    opacity: 0;\n    width: 100%;\n    transition: opacity 0.75s;\n    background-color: var(--bgcolor);\n    text-align: center;\n    z-index: 999;\n}\n\n#turn-switch.show {\n    opacity: 100;\n}\n\n#turn-switch :first-child {\n    padding-top: 10%;\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n    font-size: 16pt;\n\n    --bgcolor: #242424;\n    --lightbgcolor: #484848;\n    --bgcontrast: #eaeaea;\n    --active-board-background: #006020;\n    --inactive-board-background: #a00000;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\n#header-title {\n    font-size: 1.4em;\n    font-weight: bold;\n    margin: 0;\n    padding: 1em 0;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.8);\n    color: black;\n    border: 2px solid rgba(200, 200, 200, 0.9);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    margin: 0;\n    display: flex;\n    justify-content: space-evenly;\n}\n\n.player-entry {\n    display: grid;\n    grid-template-areas: \"player-number player-number\"\n                         \"name-label name-entry\"\n                         \"cpu-label cpu-checkbox\";\n\n    gap: 1em;\n    border-radius: 8px;\n    background-color: #484848;\n    padding: 0 1em 1em 1em;\n}\n\n.player-number {\n    grid-area: player-number;\n}\n\n.name-label {\n    grid-area: name-label;\n\n    text-align: left;\n}\n\n.player-name {\n    grid-area: name-entry;\n\n    background-color: #eaeaea;\n    color: #242424;\n    font-size: 0.9em;\n    border-radius: 8px;\n}\n\n.is-cpu-label {\n    grid-area: cpu-label;\n\n    text-align: left;\n}\n\n.is-cpu {\n    grid-area: cpu-checkbox;\n    width: min-content;\n    background-color: #eaeaea;\n}\n\n#new-game {\n    width: 10%;\n    min-width: min-content;\n    margin: 1em auto;\n    font-size: 1.2em;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n/* Battle styles - game boards, ships, docks */\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#instructions{\n    text-align: center;\n}\n\n.player-container {\n    padding: 0 1em 1em 1em;\n    background-color: var(--lightbgcolor);\n    border-radius: 16px;\n}\n\n.name {\n    text-align: center;\n    font-size: 1.2em;\n    margin: 0 auto auto auto;\n    border-top-left-radius: 12px;\n    border-top-right-radius: 12px;\n}\n\n.player-container.is-turn {\n    box-shadow: 0 0 12px 8px green;\n}\n\n.player-container.idle {\n    box-shadow: 0 0 12px 8px red;\n}\n\n.game-board {\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.tile {\n    /* width: 64px;\n    height: 64px; */\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid var(--bgcolor);\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: var(--bgcontrast);\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed var(--bgcolor);\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed var(--bgcolor);\n}\n\n.tile.right-one {\n    border-right: 1px dashed var(--bgcolor);\n}\n\n.tile.left-one {\n    border-left: 1px dashed var(--bgcolor);\n}\n\n.tile.valid-ship-placement {\n    background-color: #24aa24;\n}\n\n.tile.invalid-ship-placement {\n    background-color: #aa2424;\n}\n\n#ship-dock {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--lightbgcolor);\n    min-width: 600px;\n    min-height: 600px;\n    max-width: 600px;\n    border-radius: 16px;\n}\n\n#ship-dock.inactive *{\n    display: none;\n}\n\n#ship-container {\n    box-shadow: 0 2px 8px black inset;\n    background-color: #006020;\n    margin: 1em;\n    flex-grow: 1;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-between;\n    flex-wrap: wrap;\n}\n\n#ship-placement-controls {\n    margin: 0 auto 1em auto;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n\n    width: 80%;\n}\n\n#ship-placement-controls button {\n    width: 32%;\n    min-width: min-content;\n    margin: 1em 0;\n}\n\n.placeable-ship {\n    margin: 1em;\n    background-color: #696969;\n}\n\n#turn-switch {\n    position: absolute;\n    opacity: 0;\n    width: 100%;\n    transition: opacity 0.75s;\n    background-color: var(--bgcolor);\n    text-align: center;\n    z-index: 999;\n}\n\n#turn-switch.show {\n    opacity: 100;\n}\n\n#turn-switch :first-child {\n    padding-top: 10%;\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1105,6 +1105,7 @@ const DOMControls = (() => {
     this.gameOver = document.querySelector("#game-over");
     this.playerOneElement = document.querySelector("#player-one");
     this.playerTwoElement = document.querySelector("#player-two");
+    this.dockElement = document.querySelector("#ship-dock");
     //this.tileHeight = document.documentElement.clientHeight / 20;
 
     this.betweenTurns = false;
@@ -1197,6 +1198,11 @@ const DOMControls = (() => {
     const renderPlayerNames = (playerOne, playerTwo) => {
         this.playerOneElement.querySelector(".name").textContent = playerOne.name;
         this.playerTwoElement.querySelector(".name").textContent = playerTwo.name;
+    }
+
+    const showPlayerElements = () => {
+        this.playerOneElement.classList.remove("hidden");
+        this.playerTwoElement.classList.remove("hidden");
     }
 
     const clearContainer = (container) => {
@@ -1335,8 +1341,8 @@ const DOMControls = (() => {
         boardOne.classList.add("game-board");
         boardTwo.classList.add("game-board");
 
-        this.playerOneElement.insertBefore(boardOne, this.playerOneElement.querySelector(".ship-dock"));
-        this.playerTwoElement.insertBefore(boardTwo, this.playerTwoElement.querySelector(".ship-dock"));
+        this.playerOneElement.appendChild(boardOne);
+        this.playerTwoElement.appendChild(boardTwo);
 
         renderBoard(boardOne, playerOne);
         renderBoard(boardTwo, playerTwo);
@@ -1391,29 +1397,27 @@ const DOMControls = (() => {
     }
 
     const clearDockButtons = () => {
-        document.querySelectorAll(".ship-placement-controls").forEach(container => {
-            clearContainer(container);
-        });
+        clearContainer(document.querySelector("#ship-placement-controls"));
     }
 
     const renderDocks = (playerOne, playerTwo, resetCB, randomizeCB, readyCB) => {
-        let dock, ships;
+        let ships;
         if(playerOne.isTurn){
             ships = playerOne.unplacedShips;
             grid = this.playerOneElement.querySelector(".game-board");
-            dock = this.playerOneElement.querySelector(".ship-dock");
-            this.playerTwoElement.querySelector(".ship-dock").classList.add("inactive");
+            this.playerOneElement.classList.remove("hidden");
+            this.playerTwoElement.classList.add("hidden");
         } else {
             ships = playerTwo.unplacedShips;
             grid = this.playerTwoElement.querySelector(".game-board");
-            dock = this.playerTwoElement.querySelector(".ship-dock");
-            this.playerOneElement.querySelector(".ship-dock").classList.add("inactive");
+            this.playerTwoElement.classList.remove("hidden");
+            this.playerOneElement.classList.add("hidden");
         }
-        dock.classList.remove("inactive");
-        let container = dock.querySelector(".ship-container");
+        this.dockElement.classList.remove("hidden");
+        let container = this.dockElement.querySelector("#ship-container");
         // I realized that I kept adding callbacks to these buttons, so now I create new buttons
         // every time
-        let buttonContainer = dock.querySelector(".ship-placement-controls");
+        let buttonContainer = this.dockElement.querySelector("#ship-placement-controls");
         clearContainer(buttonContainer);
         const resetButton = document.createElement("button");
         resetButton.textContent = "Reset"
@@ -1584,6 +1588,7 @@ const DOMControls = (() => {
         hideTurnSwitch,
         showGameOver,
         switchSides,
+        showPlayerElements,
         readPlayerInput,
         clearContainer,
         setBoardGrid,

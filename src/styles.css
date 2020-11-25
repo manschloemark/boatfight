@@ -100,6 +100,7 @@ button {
     color: #242424;
     font-size: 0.9em;
     border-radius: 8px;
+    padding: 0 0.4em;
 }
 
 .is-cpu-label {
@@ -154,6 +155,60 @@ button {
     margin-top: 0;
 }
 
+.player-header {
+    display: flex;
+}
+
+#player-one .player-header {
+    flex-direction: row;
+}
+
+#player-two .player-header {
+    flex-direction: row-reverse;
+}
+
+#player-one .name {
+    text-align: left;
+}
+
+#player-two .name {
+    text-align: right;
+}
+
+.name {
+    font-size: 1.2em;
+    margin: 0 1em;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* flex-grow: 1; */
+}
+
+.name:hover {
+    overflow: visible;
+    cursor: default;
+}
+
+.turn-indicator {
+    margin: auto 0;
+    height: 1em;
+    width: 1em;
+    border-radius: 100%;
+
+    /* border: 2px solid #242424; */
+    background-image: radial-gradient(circle at top 30% left 40%, rgba(255, 255, 255, 0.5) 0, transparent 40%, rgba(0, 0, 0, 0.8) 90%);
+}
+
+.player-container.idle .turn-indicator {
+    background-color: #aa2424;
+    box-shadow: 0 0 12px 2px #aa2424;
+}
+
+.player-container.is-turn .turn-indicator {
+    background-color: #24aa24;
+    box-shadow: 0 0 12px 2px #24aa24;
+}
+
 #player-flex-box{
     display: flex;
     flex-direction: row;
@@ -173,14 +228,6 @@ button {
     border-radius: 16px;
 }
 
-.name {
-    text-align: center;
-    font-size: 1.2em;
-    margin: 0 auto auto auto;
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-}
-
 .player-container.is-turn {
     /* box-shadow: 0 0 12px 8px var(--active-board-background); */
 }
@@ -192,6 +239,7 @@ button {
 .game-board {
     display: grid;
     /* gap: 2px; */
+    max-width: min-content;
     place-content: center center;
 }
 
@@ -206,7 +254,8 @@ button {
 }
 
 .game-board .tile.unknown:hover {
-    background-color: #a00000;
+    background-color: #eaed4e;
+    cursor: pointer;
 }
 
 .tile.empty {
@@ -263,7 +312,7 @@ button {
 
 #ship-container {
     box-shadow: 0 2px 8px black inset;
-    background-color: #006020;
+    background-color: #306230;
     margin: 1em;
     flex-grow: 1;
     display: flex;
@@ -289,9 +338,10 @@ button {
 }
 
 .placeable-ship {
-    margin: 1em;
+    margin: 1em 0.5em;
     background-color: #696969;
     box-shadow: 0 0 2px #fafaea;
+    transform: scale(0.85, 0.85);
 }
 
 #turn-switch {

@@ -16,7 +16,6 @@ class Player {
                 backtracked: false,
             }
             this.enemyShipsRemaining = null; // Ugly to hard-code this
-            this.turnCount = 0;
         }
     }
 
@@ -199,7 +198,6 @@ class Player {
             // If you made it through the code above and attackHit is still null, attack randomly.
         if(attackHit === null){
             if(this.lastHit.backtracked){
-                console.log("Trying to remove this ship: ", this.enemyShipsRemaining.indexOf(this.lastHit.coords.length));
                 this.enemyShipsRemaining.splice(this.enemyShipsRemaining.indexOf(this.lastHit.coords.length), 1);
             }
             // For now, if you make it through the 4 previous and can't take a shot, that means you have already
@@ -210,8 +208,6 @@ class Player {
             this.lastHit.backtracked = false;
             attackHit = this.randomAttack(gameboard);
         }
-        console.log(this.turnCount++);
-        console.log(this.enemyShipsRemaining, this.lastHit.coords);
         return attackHit;
     }
 

@@ -16,6 +16,7 @@ class Player {
                 backtracked: false,
             }
             this.enemyShipsRemaining = null; // Ugly to hard-code this
+            this.turnCount = 0;
         }
     }
 
@@ -103,7 +104,7 @@ class Player {
         let attackHit = null;
         if(this.lastHit.coords != null){
             if(this.enemyShipsRemaining.slice(-1) == this.lastHit.coords.length){
-                this.enemyShipsRemaining.pop();
+                this.lastHit.backtracked = true;
             } else {
                 [row, column] = this.lastHit.coords[0].split(' ');
                 row = parseInt(row);
@@ -141,6 +142,7 @@ class Player {
                         // the left.
                         // If the tile to the left is not in lastHit.coords at all, that means you want to check all the way
                         // to the right
+                        this.lastHit.backtracked = true;
                         if(this.lastHit.coords.includes([row, backTrackColumn].join(' '))){
                             backTrackColumn = parseInt(this.lastHit.coords.slice(-1)[0].split(' ')[1]) - 1;
                         } else {
@@ -149,7 +151,6 @@ class Player {
                         // If the opposite side's tile is already attacked, this ship is sunk, so you want to move on
                         if(backTrackColumn >= 0 && backTrackColumn < gameboard.width && !this.playHistory.includes([row, backTrackColumn].join(""))){
                             attackHit = this.sendAttack(row, backTrackColumn, gameboard);
-                            this.lastHit.backtracked = true;
                             if(attackHit){
                                 this.lastHit.coords.push([row, backTrackColumn].join(' '));
                                 this.lastHit.coords.reverse();
@@ -176,6 +177,7 @@ class Player {
                     } else if(this.lastHit.horizontal === false && this.lastHit.backtracked === false){
                         // If you cannot attack directly above or below, try attacking the opposite end of the current line.
                         // If it is a miss, then you know that the ship targeted by lastHit is fully sunk.
+                        this.lastHit.backtracked = true;
                         let backTrackRow = row - 1;
                         if(this.lastHit.coords.includes([backTrackRow, column].join(' '))){
                             backTrackRow = parseInt(this.lastHit.coords.slice(-1)[0].split(' ')[0]) - 1;
@@ -185,7 +187,6 @@ class Player {
                         if(backTrackRow >= 0 && backTrackRow < gameboard.height && 
                                 !this.playHistory.includes([backTrackRow, column].join(""))){
                             attackHit = this.sendAttack(backTrackRow, column, gameboard);
-                            this.lastHit.backtracked = true;
                             if(attackHit){
                                 this.lastHit.coords.push([backTrackRow, column].join(' '));
                                 this.lastHit.coords.reverse();
@@ -198,7 +199,8 @@ class Player {
             // If you made it through the code above and attackHit is still null, attack randomly.
         if(attackHit === null){
             if(this.lastHit.backtracked){
-                this.enemyShipsRemaining.splice(this.enemyShipsRemaining.indexOf(this.lastHit.coords.length));
+                console.log("Trying to remove this ship: ", this.enemyShipsRemaining.indexOf(this.lastHit.coords.length));
+                this.enemyShipsRemaining.splice(this.enemyShipsRemaining.indexOf(this.lastHit.coords.length), 1);
             }
             // For now, if you make it through the 4 previous and can't take a shot, that means you have already
             // shot all of the surrounding tiles.
@@ -208,6 +210,8 @@ class Player {
             this.lastHit.backtracked = false;
             attackHit = this.randomAttack(gameboard);
         }
+        console.log(this.turnCount++);
+        console.log(this.enemyShipsRemaining, this.lastHit.coords);
         return attackHit;
     }
 

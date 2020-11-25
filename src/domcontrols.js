@@ -299,6 +299,7 @@ const DOMControls = (() => {
 
     const clearDockButtons = () => {
         clearContainer(document.querySelector("#ship-placement-controls"));
+        this.dockElement.classList.add("hidden");
     }
 
     const renderDocks = (playerOne, playerTwo, resetCB, randomizeCB, readyCB) => {

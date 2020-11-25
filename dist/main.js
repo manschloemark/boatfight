@@ -587,7 +587,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n    font-size: 16pt;\n\n    --bgcolor: #242424;\n    --lightbgcolor: #484848;\n    --bgcontrast: #eaeaea;\n    --active-board-background: #006020;\n    --inactive-board-background: #a00000;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\n#header-title {\n    font-size: 1.4em;\n    font-weight: bold;\n    margin: 0;\n    padding: 1em 0;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.8);\n    color: black;\n    border: 2px solid rgba(200, 200, 200, 0.9);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    margin: 0;\n    display: flex;\n    justify-content: space-evenly;\n}\n\n.player-entry {\n    display: grid;\n    grid-template-areas: \"player-number player-number\"\n                         \"name-label name-entry\"\n                         \"cpu-label cpu-checkbox\";\n\n    gap: 1em;\n    border-radius: 8px;\n    background-color: #484848;\n    padding: 0 1em 1em 1em;\n}\n\n.player-number {\n    grid-area: player-number;\n}\n\n.name-label {\n    grid-area: name-label;\n\n    text-align: left;\n}\n\n.player-name {\n    grid-area: name-entry;\n\n    background-color: #eaeaea;\n    color: #242424;\n    font-size: 0.9em;\n    border-radius: 8px;\n}\n\n.is-cpu-label {\n    grid-area: cpu-label;\n\n    text-align: left;\n}\n\n.is-cpu {\n    grid-area: cpu-checkbox;\n    width: min-content;\n    background-color: #eaeaea;\n}\n\n#new-game {\n    width: 10%;\n    min-width: min-content;\n    margin: 1em auto;\n    font-size: 1.2em;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n/* Battle styles - game boards, ships, docks */\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#instructions{\n    text-align: center;\n}\n\n.player-container {\n    padding: 0 1em 1em 1em;\n    background-color: var(--lightbgcolor);\n    border-radius: 16px;\n}\n\n.name {\n    text-align: center;\n    font-size: 1.2em;\n    margin: 0 auto auto auto;\n    border-top-left-radius: 12px;\n    border-top-right-radius: 12px;\n}\n\n.player-container.is-turn {\n    box-shadow: 0 0 12px 8px green;\n}\n\n.player-container.idle {\n    box-shadow: 0 0 12px 8px red;\n}\n\n.game-board {\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.tile {\n    /* width: 64px;\n    height: 64px; */\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid var(--bgcolor);\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: var(--bgcontrast);\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed var(--bgcolor);\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed var(--bgcolor);\n}\n\n.tile.right-one {\n    border-right: 1px dashed var(--bgcolor);\n}\n\n.tile.left-one {\n    border-left: 1px dashed var(--bgcolor);\n}\n\n.tile.valid-ship-placement {\n    background-color: #24aa24;\n}\n\n.tile.invalid-ship-placement {\n    background-color: #aa2424;\n}\n\n#ship-dock {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--lightbgcolor);\n    min-width: 600px;\n    min-height: 600px;\n    max-width: 600px;\n    border-radius: 16px;\n}\n\n#ship-dock.inactive *{\n    display: none;\n}\n\n#ship-container {\n    box-shadow: 0 2px 8px black inset;\n    background-color: #006020;\n    margin: 1em;\n    flex-grow: 1;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-between;\n    flex-wrap: wrap;\n}\n\n#ship-placement-controls {\n    margin: 0 auto 1em auto;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n\n    width: 80%;\n}\n\n#ship-placement-controls button {\n    width: 32%;\n    min-width: min-content;\n    margin: 1em 0;\n}\n\n.placeable-ship {\n    margin: 1em;\n    background-color: #696969;\n}\n\n#turn-switch {\n    position: absolute;\n    opacity: 0;\n    width: 100%;\n    transition: opacity 0.75s;\n    background-color: var(--bgcolor);\n    text-align: center;\n    z-index: 999;\n}\n\n#turn-switch.show {\n    opacity: 100;\n}\n\n#turn-switch :first-child {\n    padding-top: 10%;\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, ":root {\n    font-family: \"Noto Sans\", sans-serif;\n    font-size: 16pt;\n\n    --bgcolor: #242424;\n    --lightbgcolor: #484848;\n    --bgcontrast: #eaeaea;\n    --active-board-background: #006020;\n    --inactive-board-background: #a00000;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    background-color: #242424;\n    color: #eaeaea;\n}\n\nhtml {\n    width: 100%;\n    height: 100%;\n}\n\nbody {\n    width: 100%;\n    height: 100%;\n}\n\nheader {\n    padding: 0 10%;\n}\n\n#header-title {\n    font-size: 1.4em;\n    font-weight: bold;\n    margin: 0;\n    padding: 1em 0;\n}\n\nmain {\n    width: 100%;\n}\n\nmain div {\n    margin: auto;\n}\n\nbutton {\n    font-size: 1em;\n    height: 2em;\n    background-color: rgba(240, 240, 240, 0.8);\n    color: black;\n    border: 2px solid rgba(200, 200, 200, 0.9);\n    border-radius: 6px;\n}\n/* \n    Start screen styling\n*/\n#start-menu {\n    width: 60%;\n    display: flex;\n    flex-direction: column;\n    align-content: center;\n\n    text-align: center;\n}\n\n#player-creation {\n    margin: 0;\n    display: flex;\n    justify-content: space-evenly;\n}\n\n.player-entry {\n    display: grid;\n    grid-template-areas: \"player-number player-number\"\n                         \"name-label name-entry\"\n                         \"cpu-label cpu-checkbox\";\n\n    gap: 1em;\n    border-radius: 8px;\n    background-color: #484848;\n    padding: 0 1em 1em 1em;\n}\n\n.player-number {\n    grid-area: player-number;\n}\n\n.name-label {\n    grid-area: name-label;\n\n    text-align: left;\n}\n\n.player-name {\n    grid-area: name-entry;\n\n    background-color: #eaeaea;\n    color: #242424;\n    font-size: 0.9em;\n    border-radius: 8px;\n}\n\n.is-cpu-label {\n    grid-area: cpu-label;\n\n    text-align: left;\n}\n\n.is-cpu {\n    grid-area: cpu-checkbox;\n    width: min-content;\n    background-color: #eaeaea;\n}\n\n#new-game {\n    width: 10%;\n    min-width: min-content;\n    margin: 1em auto;\n    font-size: 1.2em;\n}\n\n#game-over {\n    position: absolute;\n    top: 30%;\n    width: 40%;\n    padding: 2%;\n    left: 28%;\n    border-radius: 1em;\n    background-color:rgba(36, 36, 36, 0.5);\n    text-align: center;\n}\n\n#game-over-controls {\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n}\n\n#game-over-controls button {\n    width: 40%;\n}\n\n\n/* Battle styles - game boards, ships, docks */\n\n#in-game {\n    display: flex;\n    flex-direction: column;\n}\n\n.player-container {\n    margin-top: 0;\n}\n\n#player-flex-box{\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    flex-wrap: wrap;\n    width: 100%;\n    margin: auto;\n}\n\n#instructions{\n    text-align: center;\n}\n\n.player-container {\n    padding: 0 1em 1em 1em;\n    background-color: var(--lightbgcolor);\n    border-radius: 16px;\n}\n\n.name {\n    text-align: center;\n    font-size: 1.2em;\n    margin: 0 auto auto auto;\n    border-top-left-radius: 12px;\n    border-top-right-radius: 12px;\n}\n\n.player-container.is-turn {\n    /* box-shadow: 0 0 12px 8px var(--active-board-background); */\n}\n\n.player-container.idle {\n    /* box-shadow: 0 0 12px 8px var(--inactive-board-background); */\n}\n\n.game-board {\n    display: grid;\n    /* gap: 2px; */\n    place-content: center center;\n}\n\n.tile {\n    /* width: 64px;\n    height: 64px; */\n    background-color: #244288;\n    text-align: center;\n    font-size: 18pt;\n    font-family: monospace;\n    border: 1px solid var(--bgcolor);\n}\n\n.game-board .tile.unknown:hover {\n    background-color: #a00000;\n}\n\n.tile.empty {\n    background-color: var(--bgcontrast);\n}\n\n.tile.ship {\n    background-color: #696969;\n    /* border: 1px solid #696969; */\n}\n\n.tile.damaged {\n    background-color: #a00000;\n    /* border: 1px solid #a00000; */\n}\n\n.tile.up-one {\n    border-top: 1px dashed var(--bgcolor);\n}\n\n.tile.down-one {\n    border-bottom: 1px dashed var(--bgcolor);\n}\n\n.tile.right-one {\n    border-right: 1px dashed var(--bgcolor);\n}\n\n.tile.left-one {\n    border-left: 1px dashed var(--bgcolor);\n}\n\n.tile.valid-ship-placement {\n    background-color: #24aa24;\n}\n\n.tile.invalid-ship-placement {\n    background-color: #aa2424;\n}\n\n#ship-dock {\n    display: flex;\n    flex-direction: column;\n    background-color: var(--lightbgcolor);\n    min-width: 600px;\n    min-height: 600px;\n    max-width: 600px;\n    border-radius: 16px;\n}\n\n#ship-dock.inactive *{\n    display: none;\n}\n\n#ship-container {\n    box-shadow: 0 2px 8px black inset;\n    background-color: #006020;\n    margin: 1em;\n    flex-grow: 1;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-evenly;\n    align-content: baseline;\n    flex-wrap: wrap;\n}\n\n#ship-placement-controls {\n    margin: 0 auto 1em auto;\n    display: flex;\n    flex-direction: row;\n    justify-content: space-around;\n\n    width: 80%;\n}\n\n#ship-placement-controls button {\n    width: 32%;\n    min-width: min-content;\n    margin: 1em 0;\n}\n\n.placeable-ship {\n    margin: 1em;\n    background-color: #696969;\n    box-shadow: 0 0 2px #fafaea;\n}\n\n#turn-switch {\n    position: absolute;\n    opacity: 0;\n    width: 100%;\n    transition: opacity 0.75s;\n    background-color: var(--bgcolor);\n    text-align: center;\n    z-index: 999;\n}\n\n#turn-switch.show {\n    opacity: 100;\n}\n\n#turn-switch :first-child {\n    padding-top: 10%;\n}\n\n.hidden {\n    display: none !important;\n}", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -875,6 +875,7 @@ class Player {
                 backtracked: false,
             }
             this.enemyShipsRemaining = null; // Ugly to hard-code this
+            this.turnCount = 0;
         }
     }
 
@@ -962,7 +963,7 @@ class Player {
         let attackHit = null;
         if(this.lastHit.coords != null){
             if(this.enemyShipsRemaining.slice(-1) == this.lastHit.coords.length){
-                this.enemyShipsRemaining.pop();
+                this.lastHit.backtracked = true;
             } else {
                 [row, column] = this.lastHit.coords[0].split(' ');
                 row = parseInt(row);
@@ -1000,6 +1001,7 @@ class Player {
                         // the left.
                         // If the tile to the left is not in lastHit.coords at all, that means you want to check all the way
                         // to the right
+                        this.lastHit.backtracked = true;
                         if(this.lastHit.coords.includes([row, backTrackColumn].join(' '))){
                             backTrackColumn = parseInt(this.lastHit.coords.slice(-1)[0].split(' ')[1]) - 1;
                         } else {
@@ -1008,7 +1010,6 @@ class Player {
                         // If the opposite side's tile is already attacked, this ship is sunk, so you want to move on
                         if(backTrackColumn >= 0 && backTrackColumn < gameboard.width && !this.playHistory.includes([row, backTrackColumn].join(""))){
                             attackHit = this.sendAttack(row, backTrackColumn, gameboard);
-                            this.lastHit.backtracked = true;
                             if(attackHit){
                                 this.lastHit.coords.push([row, backTrackColumn].join(' '));
                                 this.lastHit.coords.reverse();
@@ -1035,6 +1036,7 @@ class Player {
                     } else if(this.lastHit.horizontal === false && this.lastHit.backtracked === false){
                         // If you cannot attack directly above or below, try attacking the opposite end of the current line.
                         // If it is a miss, then you know that the ship targeted by lastHit is fully sunk.
+                        this.lastHit.backtracked = true;
                         let backTrackRow = row - 1;
                         if(this.lastHit.coords.includes([backTrackRow, column].join(' '))){
                             backTrackRow = parseInt(this.lastHit.coords.slice(-1)[0].split(' ')[0]) - 1;
@@ -1044,7 +1046,6 @@ class Player {
                         if(backTrackRow >= 0 && backTrackRow < gameboard.height && 
                                 !this.playHistory.includes([backTrackRow, column].join(""))){
                             attackHit = this.sendAttack(backTrackRow, column, gameboard);
-                            this.lastHit.backtracked = true;
                             if(attackHit){
                                 this.lastHit.coords.push([backTrackRow, column].join(' '));
                                 this.lastHit.coords.reverse();
@@ -1057,7 +1058,8 @@ class Player {
             // If you made it through the code above and attackHit is still null, attack randomly.
         if(attackHit === null){
             if(this.lastHit.backtracked){
-                this.enemyShipsRemaining.splice(this.enemyShipsRemaining.indexOf(this.lastHit.coords.length));
+                console.log("Trying to remove this ship: ", this.enemyShipsRemaining.indexOf(this.lastHit.coords.length));
+                this.enemyShipsRemaining.splice(this.enemyShipsRemaining.indexOf(this.lastHit.coords.length), 1);
             }
             // For now, if you make it through the 4 previous and can't take a shot, that means you have already
             // shot all of the surrounding tiles.
@@ -1067,6 +1069,8 @@ class Player {
             this.lastHit.backtracked = false;
             attackHit = this.randomAttack(gameboard);
         }
+        console.log(this.turnCount++);
+        console.log(this.enemyShipsRemaining, this.lastHit.coords);
         return attackHit;
     }
 
@@ -1398,6 +1402,7 @@ const DOMControls = (() => {
 
     const clearDockButtons = () => {
         clearContainer(document.querySelector("#ship-placement-controls"));
+        this.dockElement.classList.add("hidden");
     }
 
     const renderDocks = (playerOne, playerTwo, resetCB, randomizeCB, readyCB) => {
